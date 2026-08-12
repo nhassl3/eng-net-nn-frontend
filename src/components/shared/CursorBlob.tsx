@@ -1,11 +1,14 @@
 import { useEffect, useRef } from 'react';
 
+const supportsHover = typeof window !== 'undefined' &&
+  window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
 export function CursorBlob() {
   const blobRef = useRef<HTMLDivElement>(null);
   const dotRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+    if (!supportsHover) return;
 
     document.body.classList.add('has-cursor');
     const blob = blobRef.current;
@@ -61,6 +64,8 @@ export function CursorBlob() {
       document.body.classList.remove('has-cursor');
     };
   }, []);
+
+  if (!supportsHover) return null;
 
   return (
     <>
