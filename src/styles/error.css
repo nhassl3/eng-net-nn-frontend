@@ -1,0 +1,30 @@
+.error-page {
+  padding: 100px 0 120px;
+  min-height: calc(100svh - 66px);
+  display: flex;
+  align-items: center;
+}
+.error-content {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 80px;
+  align-items: center;
+}
+.error-title {
+  font-family: var(--font-display);
+  font-size: clamp(34px, 5.5vw, 68px);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  margin: 20px 0;
+}
+.error-desc {
+  font-size: 17px;
+  color: var(--fg-soft);
+  max-width: 46ch;
+  line-height: 1.65;
+  margin: 0 0 36px;
+}
+.error-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+.error-art { display: flex; align-items: center; justify-content: center; color: var(--accent); }
+.error-art svg { width: 100%; max-width: 340px; height: auto; }
