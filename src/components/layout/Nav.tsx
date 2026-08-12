@@ -1,13 +1,19 @@
 import { useEffect, useRef } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { LogoMark } from '../shared/LogoMark';
 import { useAppDispatch } from '../../store/hooks';
 import { openQuote } from '../../store/slices/modalSlice';
+
+function scrollToSection(id: string) {
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({ behavior: 'smooth' });
+}
 
 export function Nav() {
   const progRef = useRef<HTMLSpanElement>(null);
   const dispatch = useAppDispatch();
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const onScroll = () => {
@@ -20,7 +26,26 @@ export function Nav() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
+  // Scroll to hash anchor after navigation from another page
+  useEffect(() => {
+    if (location.hash) {
+      const id = location.hash.slice(1);
+      // Wait for page to render before scrolling
+      const t = setTimeout(() => scrollToSection(id), 50);
+      return () => clearTimeout(t);
+    }
+  }, [location]);
+
   const isActive = (path: string) => location.pathname === path;
+
+  const handleSectionClick = (e: React.MouseEvent, id: string) => {
+    e.preventDefault();
+    if (location.pathname === '/') {
+      scrollToSection(id);
+    } else {
+      navigate(`/#${id}`);
+    }
+  };
 
   return (
     <header className="nav">
@@ -29,9 +54,9 @@ export function Nav() {
           <LogoMark />
         </Link>
         <nav className="nav-links">
-          <Link to="/#services" className={isActive('/') ? '' : ''}>Услуги</Link>
-          <Link to="/#cases">Кейсы</Link>
-          <Link to="/#about">О компании</Link>
+          <a href="/#services" onClick={(e) => handleSectionClick(e, 'services')}>Услуги</a>
+          <a href="/#cases" onClick={(e) => handleSectionClick(e, 'cases')}>Кейсы</a>
+          <a href="/#about" onClick={(e) => handleSectionClick(e, 'about')}>О компании</a>
           <Link to="/vacancies" className={isActive('/vacancies') ? 'active' : ''}>Вакансии</Link>
         </nav>
         <button
