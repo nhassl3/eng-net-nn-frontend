@@ -1,0 +1,114 @@
+/* Scroll reveal */
+.reveal {
+  opacity: 0;
+  transform: translateY(64px);
+  transition: opacity 1.6s cubic-bezier(0.16, 1, 0.3, 1), transform 1.6s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+.reveal.in { opacity: 1; transform: none; }
+.reveal .sec-head,
+.reveal .services,
+.reveal .cases-stage,
+.reveal .stats,
+.reveal .certs,
+.reveal .marquee-stage,
+.reveal .cta-strip {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 1.4s cubic-bezier(0.16, 1, 0.3, 1) 0.20s, transform 1.4s cubic-bezier(0.16, 1, 0.3, 1) 0.20s;
+}
+.reveal .services      { transition-delay: 0.32s; }
+.reveal .cases-stage   { transition-delay: 0.32s; }
+.reveal .stats         { transition-delay: 0.32s; }
+.reveal .certs         { transition-delay: 0.32s; }
+.reveal .marquee-stage { transition-delay: 0.36s; }
+.reveal .cta-strip     { transition-delay: 0.18s; }
+.reveal.in .sec-head,
+.reveal.in .services,
+.reveal.in .cases-stage,
+.reveal.in .stats,
+.reveal.in .certs,
+.reveal.in .marquee-stage,
+.reveal.in .cta-strip { opacity: 1; transform: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal, .reveal * { opacity: 1 !important; transform: none !important; transition: none !important; }
+  .cursor-blob { transition: none; }
+}
+
+/* Hero load-in */
+.hero .kicker,
+.hero h1,
+.hero-meta p,
+.hero-cta-row,
+.hero-marquee {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 1.1s cubic-bezier(0.22, 1, 0.36, 1), transform 1.1s cubic-bezier(0.22, 1, 0.36, 1);
+}
+body.loaded .hero .kicker { opacity: 1; transform: none; transition-delay: 0.05s; }
+body.loaded .hero h1      { opacity: 1; transform: none; transition-delay: 0.18s; }
+body.loaded .hero-meta p  { opacity: 1; transform: none; transition-delay: 0.30s; }
+body.loaded .hero-cta-row { opacity: 1; transform: none; transition-delay: 0.42s; }
+body.loaded .hero-marquee { opacity: 1; transform: none; transition-delay: 0.54s; }
+
+/* Custom cursor */
+body.has-cursor,
+body.has-cursor * { cursor: none !important; }
+.cursor-blob,
+.cursor-dot {
+  position: fixed; top: 0; left: 0;
+  pointer-events: none; z-index: 9999;
+  border-radius: 50%;
+  will-change: transform, width, height;
+}
+.cursor-blob {
+  width: 36px; height: 36px;
+  background: rgba(31, 138, 91, 0.0);
+  border: 1.5px solid rgba(31, 138, 91, 0.85);
+  transition: width 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+              height 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+              background 0.25s ease, border-color 0.25s ease,
+              border-width 0.25s ease, opacity 0.25s ease;
+}
+.cursor-dot {
+  width: 5px; height: 5px;
+  background: var(--accent);
+  transition: opacity 0.2s ease, transform 0.05s linear, width 0.2s ease, height 0.2s ease;
+}
+.cursor-blob.hover { width: 64px; height: 64px; background: rgba(31, 138, 91, 0.10); border-color: rgba(31, 138, 91, 0.6); border-width: 1px; }
+.cursor-blob.press { width: 26px; height: 26px; background: rgba(31, 138, 91, 0.18); }
+
+/* Fade-up utility */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: none; }
+}
+.fade-up { animation: fade-up 0.7s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.fade-up.d1 { animation-delay: 0.06s; }
+.fade-up.d2 { animation-delay: 0.12s; }
+.fade-up.d3 { animation-delay: 0.18s; }
+.fade-up.d4 { animation-delay: 0.24s; }
+
+/* Responsive */
+@media (max-width: 960px) {
+  .hero-grid { grid-template-columns: 1fr; gap: 40px; }
+  .sec-head { grid-template-columns: 1fr; }
+  .services { grid-template-columns: repeat(2, 1fr); }
+  .case { grid-template-columns: 1fr; }
+  .case-info { padding: 32px; }
+  .stats { grid-template-columns: repeat(2, 1fr); }
+  .stat:nth-child(2) { border-right: none; }
+  .stat:nth-child(1), .stat:nth-child(2) { border-bottom: 1px solid var(--border); }
+  .calc { grid-template-columns: 1fr; }
+  .certs { grid-template-columns: repeat(2, 1fr); }
+  .cta-strip { grid-template-columns: 1fr; padding: 56px 32px; }
+  .footer-grid { grid-template-columns: 1fr 1fr; }
+  .nav-links { display: none; }
+  .vac-grid { grid-template-columns: 1fr; }
+  .form-card { position: static; }
+  .hero-marquee { grid-template-columns: repeat(2, 1fr); }
+  .error-content { grid-template-columns: 1fr; gap: 48px; }
+  .error-art { order: -1; }
+  .error-art svg { max-width: 240px; }
+}
