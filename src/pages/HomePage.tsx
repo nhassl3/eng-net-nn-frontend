@@ -6,7 +6,6 @@ import { Hero } from '../components/home/Hero';
 import { Services } from '../components/home/Services';
 import { Cases } from '../components/home/Cases';
 import { Stats } from '../components/home/Stats';
-import { Calculator } from '../components/home/Calculator';
 import { Certs } from '../components/home/Certs';
 import { Partners } from '../components/home/Partners';
 import { CTA } from '../components/home/CTA';
@@ -37,7 +36,6 @@ export function HomePage() {
           <Services />
           <Cases />
           <Stats />
-          <Calculator />
           <Certs />
           <Partners />
           <CTA />
