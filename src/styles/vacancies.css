@@ -80,3 +80,28 @@
   display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px;
 }
 .vac-success h2 { font-family: var(--font-display); font-size: 28px; margin: 0 0 8px; font-weight: 500; letter-spacing: -0.015em; }
+
+/* ── Responsive ── */
+@media (max-width: 1023px) {
+  .vac-grid { grid-template-columns: 1fr; }
+  .form-card { position: static; }
+}
+
+@media (max-width: 767px) {
+  .vac-hero { padding: 40px 0 24px; }
+  .vac-hero p { font-size: 15px; }
+
+  .vac-item h3 { font-size: 18px; }
+  .vac-item .meta { flex-wrap: wrap; gap: 6px 12px; }
+
+  .form-card { padding: 24px 20px; }
+  .form-grid { grid-template-columns: 1fr; }
+  .form-grid .full { grid-column: 1; }
+}
+
+@media (max-width: 480px) {
+  .vac-item .row1 { flex-direction: column; align-items: flex-start; gap: 4px; }
+  .vac-item .salary { white-space: normal; }
+  .form-card { padding: 20px 16px; border-radius: var(--radius); }
+  .form-card h2 { font-size: 22px; }
+}

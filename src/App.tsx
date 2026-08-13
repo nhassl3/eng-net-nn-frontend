@@ -1,16 +1,24 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { Provider } from 'react-redux';
-import { store } from './store';
-import { HomePage } from './pages/HomePage';
-import { VacanciesPage } from './pages/VacanciesPage';
-import { NotFoundPage } from './pages/NotFoundPage';
-import { ServerErrorPage } from './pages/ServerErrorPage';
-import { AccessDeniedPage } from './pages/AccessDeniedPage';
+import { useEffect } from 'react'
+import { Provider } from 'react-redux'
+import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom'
+import { AccessDeniedPage } from './pages/AccessDeniedPage'
+import { HomePage } from './pages/HomePage'
+import { NotFoundPage } from './pages/NotFoundPage'
+import { ServerErrorPage } from './pages/ServerErrorPage'
+import { VacanciesPage } from './pages/VacanciesPage'
+import { store } from './store'
+
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => { window.scrollTo({ top: 0, behavior: 'smooth' }); }, [pathname]);
+  return null;
+}
 
 export default function App() {
   return (
     <Provider store={store}>
       <BrowserRouter>
+        <ScrollToTop />
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/vacancies" element={<VacanciesPage />} />

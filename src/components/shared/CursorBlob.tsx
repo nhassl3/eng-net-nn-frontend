@@ -32,10 +32,10 @@ export function CursorBlob() {
     const onOver = (e: MouseEvent) => {
       let el = e.target as Element | null;
       while (el && el !== document.body) {
-        if (isInteractive(el)) { blob.classList.add('hover'); return; }
+        if (isInteractive(el)) { blob.classList.add('hover'); dot.classList.add('hover'); return; }
         el = el.parentElement;
       }
-      blob.classList.remove('hover');
+      blob.classList.remove('hover'); dot.classList.remove('hover');
     };
 
     window.addEventListener('mousemove', onMove);
