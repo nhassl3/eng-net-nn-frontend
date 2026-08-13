@@ -20,11 +20,12 @@
   --grid-strong: rgba(11, 11, 14, 0.08);
   --blueprint: rgba(31, 138, 91, 0.18);
 
-  --radius-sm: 6px;
-  --radius: 10px;
-  --radius-lg: 16px;
+  --radius-sm: 5px;
+  --radius: 9px;
+  --radius-lg: 15px;
 
-  --container: 1280px;
+  --container: 1281px;
+  --nav-h: 69px;
 
   --font-display: "Space Grotesk", "Helvetica Neue", Helvetica, Arial, sans-serif;
   --font-body: "Manrope", "Helvetica Neue", Helvetica, Arial, sans-serif;
