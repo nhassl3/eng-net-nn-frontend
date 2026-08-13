@@ -100,9 +100,21 @@
 .case-dots button {
   width: 28px; height: 4px; border-radius: 2px;
   background: var(--border-strong); border: none;
-  transition: background 0.2s ease, width 0.2s ease;
+  transition: width 0.3s ease;
+  position: relative; overflow: hidden;
 }
-.case-dots button.active { background: var(--accent); width: 44px; }
+.case-dots button.active { width: 44px; }
+.case-dots button.active::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: var(--accent);
+  transform-origin: left center;
+  animation: dot-fill 3s linear forwards;
+}
+@keyframes dot-fill {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
 .case-arrows { display: flex; gap: 8px; }
 .case-arrows button {
   width: 44px; height: 44px; border-radius: 50%;
@@ -121,7 +133,12 @@
 }
 .case-arrows button:hover::before { transform: scale(1); }
 .case-arrows button:hover { color: #fff; border-color: var(--accent); transform: translateY(-1px); }
-.case-arrows .arrow { width: 16px; height: 16px; }
+.case-arrows .arrow {
+  display: inline-block; width: 16px; height: 16px;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M5 12h13M13 6l6 6-6 6' stroke='black' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>") center/contain no-repeat;
+          mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M5 12h13M13 6l6 6-6 6' stroke='black' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>") center/contain no-repeat;
+}
 .case-arrows .left .arrow { transform: rotate(180deg); }
 
 /* Stats */

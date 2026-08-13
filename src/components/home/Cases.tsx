@@ -1,10 +1,18 @@
+import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { next, prev, setIndex } from '../../store/slices/casesSlice';
 import { CASES } from '../../data/cases';
 
+const SLIDE_DELAY = 3000;
+
 export function Cases() {
   const dispatch = useAppDispatch();
   const activeIndex = useAppSelector((s) => s.cases.activeIndex);
+
+  useEffect(() => {
+    const id = setInterval(() => dispatch(next()), SLIDE_DELAY);
+    return () => clearInterval(id);
+  }, [activeIndex, dispatch]);
 
   return (
     <section id="cases" className="section-pad reveal">
