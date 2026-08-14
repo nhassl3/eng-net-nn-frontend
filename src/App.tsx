@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { Provider } from 'react-redux'
 import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom'
 import { AccessDeniedPage } from './pages/AccessDeniedPage'
+import { AuthorizationPage } from './pages/AuthorizationPage'
 import { HomePage } from './pages/HomePage'
 import { NotFoundPage } from './pages/NotFoundPage'
 import { ServerErrorPage } from './pages/ServerErrorPage'
@@ -22,6 +23,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/vacancies" element={<VacanciesPage />} />
+          <Route path="/auth" element={<AuthorizationPage />} />
           <Route path="/403" element={<AccessDeniedPage />} />
           <Route path="/500" element={<ServerErrorPage />} />
           <Route path="*" element={<NotFoundPage />} />
