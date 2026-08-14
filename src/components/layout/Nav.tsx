@@ -64,6 +64,7 @@ export function Nav() {
           <a href="/#about" onClick={(e) => handleSectionClick(e, 'about')}>О компании</a>
           <Link to="/vacancies" className={isActive('/vacancies') ? 'active' : ''}>Вакансии</Link>
         </nav>
+        <Link to="/auth" className={`nav-auth${isActive('/auth') ? ' active' : ''}`}>Войти</Link>
         <button type="button" className="nav-cta" onClick={handleCTA}>
           <span className="dot" />
           Получить КП
@@ -86,6 +87,9 @@ export function Nav() {
           <a href="/#about" onClick={(e) => handleSectionClick(e, 'about')}>О компании</a>
           <Link to="/vacancies" className={isActive('/vacancies') ? 'active' : ''} onClick={close}>
             Вакансии
+          </Link>
+          <Link to="/auth" className={isActive('/auth') ? 'active' : ''} onClick={close}>
+            Войти
           </Link>
           <div className="nav-mobile-cta">
             <button type="button" className="nav-cta" onClick={handleCTA}>
