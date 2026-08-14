@@ -50,7 +50,11 @@ export function Nav() {
     }
   };
 
-  const handleCTA = () => { close(); dispatch(openQuote()); };
+  const handleCTA = () => {
+    close();
+    dispatch(openQuote());
+    if (location.pathname !== '/') navigate('/');
+  };
 
   return (
     <header className="nav">
