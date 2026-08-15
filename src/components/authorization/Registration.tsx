@@ -1,11 +1,14 @@
 import { useState } from 'react';
-import { register } from '../../api/authorization';
+import { useNavigate } from 'react-router';
+import { useAuth } from '../../context/AuthContext';
 
 interface Props {
   onSwitch: () => void;
 }
 
 export function Registration({ onSwitch }: Props) {
+  const { register } = useAuth();
+  const navigate = useNavigate();
   const [name, setName] = useState('');
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
@@ -31,6 +34,7 @@ export function Registration({ onSwitch }: Props) {
     setLoading(true);
     try {
       await register(name, username, email, password);
+      navigate('/');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Ошибка регистрации');
     } finally {

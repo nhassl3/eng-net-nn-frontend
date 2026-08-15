@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
 import { LogoMark } from '../shared/LogoMark';
 import { useAppDispatch } from '../../store/hooks';
 import { openQuote } from '../../store/slices/modalSlice';
@@ -15,6 +16,7 @@ export function Nav() {
   const dispatch = useAppDispatch();
   const location = useLocation();
   const navigate = useNavigate();
+  const { user, isAuthenticated, logout } = useAuth();
 
   useEffect(() => { setOpen(false); }, [location.pathname]);
 
@@ -38,6 +40,12 @@ export function Nav() {
   }, [location]);
 
   const close = () => setOpen(false);
+
+  const handleLogout = () => {
+    close();
+    logout();
+    navigate('/');
+  };
   const isActive = (path: string) => location.pathname === path;
 
   const handleSectionClick = (e: React.MouseEvent, id: string) => {
@@ -68,7 +76,13 @@ export function Nav() {
           <a href="/#about" onClick={(e) => handleSectionClick(e, 'about')}>О компании</a>
           <Link to="/vacancies" className={isActive('/vacancies') ? 'active' : ''}>Вакансии</Link>
         </nav>
-        <Link to="/auth" className={`nav-auth${isActive('/auth') ? ' active' : ''}`}>Войти</Link>
+        {isAuthenticated ? (
+          <button type="button" className="nav-auth" onClick={handleLogout}>
+            Выйти ({user!.username})
+          </button>
+        ) : (
+          <Link to="/auth" className={`nav-auth${isActive('/auth') ? ' active' : ''}`}>Войти</Link>
+        )}
         <button type="button" className="nav-cta" onClick={handleCTA}>
           <span className="dot" />
           Получить КП
@@ -92,9 +106,15 @@ export function Nav() {
           <Link to="/vacancies" className={isActive('/vacancies') ? 'active' : ''} onClick={close}>
             Вакансии
           </Link>
-          <Link to="/auth" className={isActive('/auth') ? 'active' : ''} onClick={close}>
-            Войти
-          </Link>
+          {isAuthenticated ? (
+            <button type="button" className="nav-auth" onClick={handleLogout}>
+              Выйти ({user!.username})
+            </button>
+          ) : (
+            <Link to="/auth" className={isActive('/auth') ? 'active' : ''} onClick={close}>
+              Войти
+            </Link>
+          )}
           <div className="nav-mobile-cta">
             <button type="button" className="nav-cta" onClick={handleCTA}>
               <span className="dot" />

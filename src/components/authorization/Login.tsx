@@ -1,11 +1,14 @@
 import { useState } from 'react'
-import { login } from '../../api/authorization'
+import { useNavigate } from 'react-router'
+import { useAuth } from '../../context/AuthContext'
 
 interface Props {
   onSwitch: () => void;
 }
 
 export function Login({ onSwitch }: Props) {
+  const { login } = useAuth();
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPwd, setShowPwd] = useState(false);
@@ -19,7 +22,7 @@ export function Login({ onSwitch }: Props) {
     setLoading(true);
     try {
       await login(email, password);
-      // TODO: store token / redirect
+      navigate('/');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Ошибка авторизации');
 			if (err instanceof Error && err.message.includes('401')) {
