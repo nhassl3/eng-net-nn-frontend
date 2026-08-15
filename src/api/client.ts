@@ -45,6 +45,7 @@ export async function apiFetch<T>(path: string, options?: RequestInit): Promise<
       res = await rawFetch(path, options);
     } else {
       authStorage.clear();
+      window.dispatchEvent(new Event('auth:session-expired'));
       throw new Error('SESSION_EXPIRED');
     }
   }
