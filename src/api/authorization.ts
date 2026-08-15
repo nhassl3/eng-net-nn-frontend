@@ -1,6 +1,6 @@
+import type { User } from '../types/domain'
 import { authStorage } from './authStorage'
 import { apiFetch } from './client'
-import type { User } from '../types/domain'
 
 export interface AuthResponse {
   tokens: { access_token: string; refresh_token: string };
@@ -30,8 +30,9 @@ export async function register(
   return data;
 }
 
-export function getMe(): Promise<User> {
-  return apiFetch<User>('/auth/me');
+export async function getMe(): Promise<User> {
+  const data = await apiFetch<{ user: User }>('/api/me');
+  return data.user;
 }
 
 export function refresh(refresh_token: string): Promise<{ access_token: string; refresh_token: string }> {
