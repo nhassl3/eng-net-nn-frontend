@@ -9,19 +9,19 @@ interface Props {
 export function Login({ onSwitch }: Props) {
   const { login } = useAuth();
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
+  const [userIn, setUserIn] = useState('');
   const [password, setPassword] = useState('');
   const [showPwd, setShowPwd] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [failed, setFailed] = useState(false);
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
     setLoading(true);
     try {
-      await login(email, password);
+      await login(userIn, password);
       navigate('/');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Ошибка авторизации');
@@ -38,15 +38,14 @@ export function Login({ onSwitch }: Props) {
       {error && <p className="auth-error">{error}</p>}
 
       <div className="auth-field">
-        <label className="auth-label" htmlFor="login-email">Email</label>
+        <label className="auth-label" htmlFor="login-email-username">Username или Email</label>
         <input
-          id="login-email"
+          id="login-email-username"
           className="auth-input"
-          type="email"
-          autoComplete="email"
-          placeholder="you@company.com"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          type="text"
+          placeholder="you@company.com | username"
+          value={userIn}
+          onChange={(e) => setUserIn(e.target.value)}
           required
         />
       </div>

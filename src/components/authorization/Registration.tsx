@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router';
-import { useAuth } from '../../context/AuthContext';
+import { useState } from 'react'
+import { useNavigate } from 'react-router'
+import { useAuth } from '../../context/AuthContext'
 
 interface Props {
   onSwitch: () => void;
@@ -18,7 +18,7 @@ export function Registration({ onSwitch }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
 
@@ -36,7 +36,12 @@ export function Registration({ onSwitch }: Props) {
       await register(name, username, email, password);
       navigate('/');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ошибка регистрации');
+      const errMsg = err instanceof Error ? err.message : 'Ошибка регистрации';
+      if (errMsg === 'user already exists') {
+        setError('Пользователь с таким email уже существует');
+        return;
+      }
+      setError(errMsg);
     } finally {
       setLoading(false);
     }
