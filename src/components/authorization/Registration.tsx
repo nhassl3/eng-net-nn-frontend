@@ -7,6 +7,7 @@ interface Props {
 
 export function Registration({ onSwitch }: Props) {
   const [name, setName] = useState('');
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
@@ -29,8 +30,7 @@ export function Registration({ onSwitch }: Props) {
 
     setLoading(true);
     try {
-      await register(name, email, password);
-      // TODO: store token / redirect
+      await register(name, username, email, password);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Ошибка регистрации');
     } finally {
@@ -66,6 +66,20 @@ export function Registration({ onSwitch }: Props) {
           placeholder="Иван Иванов"
           value={name}
           onChange={(e) => setName(e.target.value)}
+          required
+        />
+      </div>
+
+      <div className="auth-field">
+        <label className="auth-label" htmlFor="reg-username">Username</label>
+        <input
+          id="reg-username"
+          className="auth-input"
+          type="text"
+          autoComplete="username"
+          placeholder="ivan_ivanov"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
           required
         />
       </div>
