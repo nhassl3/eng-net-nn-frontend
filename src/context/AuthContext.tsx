@@ -3,8 +3,6 @@ import { login as apiLogin, register as apiRegister, getMe, logout as apiLogout 
 import { authStorage } from '../api/authStorage'
 import type { User } from '../types/domain'
 
-const CACHED_USER_KEY = 'ipb_cached_user';
-
 interface AuthContextValue {
   user: User | null;
   isLoading: boolean;
@@ -19,18 +17,9 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(() => {
     if (!authStorage.getAccessToken()) return null;
-    const cached = localStorage.getItem(CACHED_USER_KEY);
-    return cached ? (JSON.parse(cached) as User) : null;
+    return authStorage.getUser();
   });
-  const [isLoading, setIsLoading] = useState(true);
-
-  const cacheUser = useCallback((u: User | null) => {
-    if (u) {
-      localStorage.setItem(CACHED_USER_KEY, JSON.stringify(u));
-    } else {
-      localStorage.removeItem(CACHED_USER_KEY);
-    }
-  }, []);
+  const [isLoading, setIsLoading] = useState(() => !!authStorage.getAccessToken());
 
   useEffect(() => {
     let cancelled = false;
@@ -41,34 +30,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
     getMe()
       .then((u) => {
-        if (!cancelled) { setUser(u); cacheUser(u); }
+        if (!cancelled) {
+          authStorage.setUser(u);
+          setUser(u);
+        }
       })
       .catch(() => {
         if (!cancelled) {
           authStorage.clear();
           setUser(null);
-          cacheUser(null);
         }
       })
       .finally(() => { if (!cancelled) setIsLoading(false); });
     return () => { cancelled = true; };
-  }, [cacheUser]);
+  }, []);
 
   useEffect(() => {
     const handleExpired = () => {
       setUser(null);
-      cacheUser(null);
       setIsLoading(false);
     };
     window.addEventListener('auth:session-expired', handleExpired);
     return () => window.removeEventListener('auth:session-expired', handleExpired);
-  }, [cacheUser]);
+  }, []);
 
   const login = useCallback(async (email: string, password: string) => {
     const data = await apiLogin(email, password);
+    authStorage.setUser(data.user);
     setUser(data.user);
-    cacheUser(data.user);
-  }, [cacheUser]);
+  }, []);
 
   const register = useCallback(async (
     name: string,
@@ -77,15 +67,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     password: string,
   ) => {
     const data = await apiRegister(name, username, email, password);
+    authStorage.setUser(data.user);
     setUser(data.user);
-    cacheUser(data.user);
-  }, [cacheUser]);
+  }, []);
 
   const logout = useCallback(() => {
     apiLogout();
     setUser(null);
-    cacheUser(null);
-  }, [cacheUser]);
+  }, []);
 
   return (
     <AuthContext.Provider value={{ user, isLoading, isAuthenticated: !!user, login, register, logout }}>
