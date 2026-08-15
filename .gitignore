@@ -27,3 +27,4 @@ CLAUDE.md
 node_modules/
 eng-nn-net-frontend
 eng-nn-net-frontend.pub
+.env
