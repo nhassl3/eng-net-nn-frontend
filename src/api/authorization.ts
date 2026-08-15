@@ -1,9 +1,10 @@
 import { authStorage } from './authStorage'
 import { apiFetch } from './client'
+import type { User } from '../types/domain'
 
 export interface AuthResponse {
   tokens: { access_token: string; refresh_token: string };
-  user: { id: string; username: string; full_name: string; email: string };
+  user: User;
 }
 
 export async function login(email: string, password: string): Promise<AuthResponse> {
@@ -11,7 +12,7 @@ export async function login(email: string, password: string): Promise<AuthRespon
     method: 'POST',
     body: JSON.stringify({ email, password }),
   });
-  authStorage.set(data.tokens, data.user);
+  authStorage.setTokens(data.tokens);
   return data;
 }
 
@@ -25,8 +26,12 @@ export async function register(
     method: 'POST',
     body: JSON.stringify({ name, username, email, password }),
   });
-  authStorage.set(data.tokens, data.user);
+  authStorage.setTokens(data.tokens);
   return data;
+}
+
+export function getMe(): Promise<User> {
+  return apiFetch<User>('/auth/me');
 }
 
 export function refresh(refresh_token: string): Promise<{ access_token: string; refresh_token: string }> {
