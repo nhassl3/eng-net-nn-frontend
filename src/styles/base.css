@@ -1,6 +1,5 @@
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
-body { padding-top: var(--nav-h); }
 html { scroll-behavior: smooth; }
 body {
   font-family: var(--font-body);
