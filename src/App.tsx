@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { Provider } from 'react-redux'
 import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom'
+import { AuthProvider } from './context/AuthContext'
 import { AccessDeniedPage } from './pages/AccessDeniedPage'
 import { AuthorizationPage } from './pages/AuthorizationPage'
 import { HomePage } from './pages/HomePage'
@@ -19,6 +20,7 @@ export default function App() {
   return (
     <Provider store={store}>
       <BrowserRouter>
+        <AuthProvider>
         <ScrollToTop />
         <Routes>
           <Route path="/" element={<HomePage />} />
@@ -28,6 +30,7 @@ export default function App() {
           <Route path="/500" element={<ServerErrorPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
+        </AuthProvider>
       </BrowserRouter>
     </Provider>
   );
