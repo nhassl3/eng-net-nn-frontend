@@ -11,11 +11,8 @@ import { Footer } from '../components/layout/Footer'
 import { Nav } from '../components/layout/Nav'
 import { useScrollReveal } from '../hooks/useScrollReveal'
 import { useAppSelector } from '../store/hooks'
-import { useBackgroundEffects } from '../hooks/useBackgroundEffects';
-import { CursorBlob } from ' ../components/shared/CursorBlob';
 
 export function HomePage() {
-  useBackgroundEffects();
   useScrollReveal();
   const quoteOpen = useAppSelector((s) => s.modal.quoteOpen);
 
@@ -41,7 +38,6 @@ export function HomePage() {
         <Footer />
       </div>
       <QuoteModal />
-      <CursorBlob />
     </>
   );
 }
