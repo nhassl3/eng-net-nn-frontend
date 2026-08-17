@@ -51,6 +51,14 @@ export function CursorBlob() {
       isHovering = hovering;
       blob.classList.toggle('hover', hovering);
       dot.classList.toggle('hover', hovering);
+      if (!hovering) {
+        // Dot was frozen while hidden during hover — snap it to the cursor
+        // (not the blob) so it reappears exactly where it would have settled.
+        dx = mx; dy = my;
+        const rdx = Math.round(dx * 10) / 10, rdy = Math.round(dy * 10) / 10;
+        dot.style.translate = `${rdx}px ${rdy}px`;
+        lastDx = rdx; lastDy = rdy;
+      }
     };
 
     window.addEventListener('mousemove', onMove, { passive: true });
