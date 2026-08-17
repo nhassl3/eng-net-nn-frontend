@@ -26,9 +26,9 @@ export function CursorBlob() {
     const blobEase = reducedMotion ? 1 : 0.16;
     const dotEase = reducedMotion ? 1 : 0.45;
 
-    let mx = window.innerWidth / 2, my = window.innerHeight / 2;
-    let bx = mx, by = my;
-    let dx = mx, dy = my;
+    let mx = window.innerWidth / 2, my = window.innerHeight / 2; // mouse position
+    let bx = mx, by = my; // blob position
+    let dx = mx, dy = my; // dot position
     let lastBx = NaN, lastBy = NaN, lastDx = NaN, lastDy = NaN;
 
     let raf = 0;
