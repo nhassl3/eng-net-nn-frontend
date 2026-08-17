@@ -1,9 +1,6 @@
-import { useEffect, type ReactNode } from 'react';
-import { BlueprintBackground } from '../layout/BlueprintBackground';
-import { Nav } from '../layout/Nav';
-import { Footer } from '../layout/Footer';
-import { CursorBlob } from './CursorBlob';
-import { useBackgroundEffects } from '../../hooks/useBackgroundEffects';
+import { useEffect, type ReactNode } from 'react'
+import { Footer } from '../layout/Footer'
+import { Nav } from '../layout/Nav'
 
 interface Props {
   code: string;
@@ -14,8 +11,6 @@ interface Props {
 }
 
 export function ErrorPage({ code, title, description, art, actions }: Props) {
-  useBackgroundEffects();
-
   useEffect(() => {
     document.documentElement.setAttribute('data-style', 'b');
     requestAnimationFrame(() => document.body.classList.add('loaded'));
@@ -24,7 +19,6 @@ export function ErrorPage({ code, title, description, art, actions }: Props) {
 
   return (
     <>
-      <BlueprintBackground />
       <Nav />
       <main>
         <section className="error-page">
@@ -44,7 +38,6 @@ export function ErrorPage({ code, title, description, art, actions }: Props) {
         </section>
       </main>
       <Footer />
-      <CursorBlob />
     </>
   );
 }
