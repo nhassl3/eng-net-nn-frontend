@@ -7,8 +7,6 @@ import '../styles/authorization.css'
 type Mode = 'login' | 'register';
 
 export function AuthorizationPage() {
-  useBackgroundEffects();
-
   const [mode, setMode] = useState<Mode>('login');
 
   useEffect(() => {
@@ -61,7 +59,6 @@ export function AuthorizationPage() {
           </div>
         </section>
       </main>
-      <CursorBlob />
     </>
   );
 }
