@@ -69,18 +69,22 @@ export function CursorBlob() {
     function tick() {
       bx += (mx - bx) * blobEase;
       by += (my - by) * blobEase;
-      dx += (mx - dx) * dotEase;
-      dy += (my - dy) * dotEase;
+      if (!isHovering) {
+        dx += (mx - dx) * dotEase;
+        dy += (my - dy) * dotEase;
+      }
 
       const rbx = Math.round(bx * 10) / 10, rby = Math.round(by * 10) / 10;
-      const rdx = Math.round(dx * 10) / 10, rdy = Math.round(dy * 10) / 10;
       if (rbx !== lastBx || rby !== lastBy) {
         blob!.style.translate = `${rbx}px ${rby}px`;
         lastBx = rbx; lastBy = rby;
       }
-      if (rdx !== lastDx || rdy !== lastDy) {
-        dot!.style.translate = `${rdx}px ${rdy}px`;
-        lastDx = rdx; lastDy = rdy;
+      if (!isHovering) {
+        const rdx = Math.round(dx * 10) / 10, rdy = Math.round(dy * 10) / 10;
+        if (rdx !== lastDx || rdy !== lastDy) {
+          dot!.style.translate = `${rdx}px ${rdy}px`;
+          lastDx = rdx; lastDy = rdy;
+        }
       }
 
       const settled = Math.abs(mx - bx) < SETTLE_EPSILON && Math.abs(my - by) < SETTLE_EPSILON &&
