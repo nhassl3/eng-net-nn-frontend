@@ -5,11 +5,8 @@ import { VacancyForm } from '../components/vacancies/VacancyForm'
 import { VacancyHero } from '../components/vacancies/VacancyHero'
 import { VacancyList } from '../components/vacancies/VacancyList'
 import { useScrollReveal } from '../hooks/useScrollReveal'
-import { CursorBlob } from '../components/shared/CursorBlob';
-import { useBackgroundEffects } from '../hooks/useBackgorundEffects';
 
 export function VacanciesPage() {
-  useBackgroundEffects();
   useScrollReveal();
 
   useEffect(() => {
@@ -33,7 +30,6 @@ export function VacanciesPage() {
         </section>
       </main>
       <Footer />
-      <CursorBlob />
     </>
   );
 }
