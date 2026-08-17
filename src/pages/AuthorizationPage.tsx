@@ -19,7 +19,6 @@ export function AuthorizationPage() {
 
   return (
     <>
-      <BlueprintBackground />
       <Nav />
       <main>
         <section className="auth-page">
