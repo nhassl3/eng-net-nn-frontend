@@ -8,6 +8,7 @@ import { HomePage } from './pages/HomePage'
 import { NotFoundPage } from './pages/NotFoundPage'
 import { ServerErrorPage } from './pages/ServerErrorPage'
 import { VacanciesPage } from './pages/VacanciesPage'
+import { CursorBlob } from './components/shared/CursorBlob'
 import { store } from './store'
 
 function ScrollToTop() {
@@ -30,6 +31,7 @@ export default function App() {
           <Route path="/500" element={<ServerErrorPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
+        <CursorBlob />
         </AuthProvider>
       </BrowserRouter>
     </Provider>
