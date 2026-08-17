@@ -1,8 +1,8 @@
-import { CERTS } from '../../data/certs';
+import { CERTS } from '../../data/certs'
 
 export function Certs() {
   return (
-    <section className="section-pad-sm reveal">
+    <section id="certificates" className="section-pad-sm reveal">
       <div className="container">
         <div className="sec-head">
           <div>
