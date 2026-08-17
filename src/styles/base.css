@@ -15,13 +15,3 @@ a { color: inherit; text-decoration: none; }
 button { font: inherit; cursor: pointer; }
 
 main, footer { position: relative; z-index: 1; }
-
-.bg-stack {
-  position: fixed; inset: 0;
-  pointer-events: none;
-  z-index: 0;
-}
-.bg-vignette {
-  position: absolute; inset: 0;
-  background: radial-gradient(ellipse 81% 51% at 51% 99%, rgba(11,11,14,0.04), transparent 70%);
-}
