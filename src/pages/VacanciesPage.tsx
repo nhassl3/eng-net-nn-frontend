@@ -1,16 +1,12 @@
-import { useEffect } from 'react';
-import { BlueprintBackground } from '../components/layout/BlueprintBackground';
-import { Nav } from '../components/layout/Nav';
-import { Footer } from '../components/layout/Footer';
-import { VacancyHero } from '../components/vacancies/VacancyHero';
-import { VacancyList } from '../components/vacancies/VacancyList';
-import { VacancyForm } from '../components/vacancies/VacancyForm';
-import { CursorBlob } from '../components/shared/CursorBlob';
-import { useBackgroundEffects } from '../hooks/useBackgroundEffects';
-import { useScrollReveal } from '../hooks/useScrollReveal';
+import { useEffect } from 'react'
+import { Footer } from '../components/layout/Footer'
+import { Nav } from '../components/layout/Nav'
+import { VacancyForm } from '../components/vacancies/VacancyForm'
+import { VacancyHero } from '../components/vacancies/VacancyHero'
+import { VacancyList } from '../components/vacancies/VacancyList'
+import { useScrollReveal } from '../hooks/useScrollReveal'
 
 export function VacanciesPage() {
-  useBackgroundEffects();
   useScrollReveal();
 
   useEffect(() => {
@@ -21,7 +17,6 @@ export function VacanciesPage() {
 
   return (
     <>
-      <BlueprintBackground />
       <Nav />
       <VacancyHero />
       <main>
@@ -35,7 +30,6 @@ export function VacanciesPage() {
         </section>
       </main>
       <Footer />
-      <CursorBlob />
     </>
   );
 }

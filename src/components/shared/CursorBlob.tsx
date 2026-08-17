@@ -1,7 +1,14 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react'
 
 const supportsHover = typeof window !== 'undefined' &&
   window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+const INTERACTIVE_SELECTOR =
+  'a, button, input, textarea, select, .vac-item, .marquee-chip, .service, .cert, .case-arrows button, .case-dots button, .seg button, .qm-chip';
+
+// Below this distance (px) the blob/dot are considered to have caught up —
+// the rAF loop stops instead of running forever at 60fps while idle.
+const SETTLE_EPSILON = 0.1;
 
 export function CursorBlob() {
   const blobRef = useRef<HTMLDivElement>(null);
@@ -15,44 +22,79 @@ export function CursorBlob() {
     const dot = dotRef.current;
     if (!blob || !dot) return;
 
-    let mx = window.innerWidth / 2, my = window.innerHeight / 2;
-    let bx = mx, by = my;
-    let dx = mx, dy = my;
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const blobEase = reducedMotion ? 1 : 0.16;
+    const dotEase = reducedMotion ? 1 : 0.45;
 
-    const onMove = (e: MouseEvent) => { mx = e.clientX; my = e.clientY; };
+    let mx = window.innerWidth / 2, my = window.innerHeight / 2; // mouse position
+    let bx = mx, by = my; // blob position
+    let dx = mx, dy = my; // dot position
+    let lastBx = NaN, lastBy = NaN, lastDx = NaN, lastDy = NaN;
+
+    let raf = 0;
+    let running = false;
+
+    const onMove = (e: MouseEvent) => {
+      mx = e.clientX; my = e.clientY;
+      if (!running) {
+        running = true;
+        raf = requestAnimationFrame(tick);
+      }
+    };
     const onDown = () => blob.classList.add('press');
     const onUp = () => blob.classList.remove('press');
 
-    const isInteractive = (el: Element | null): boolean => {
-      if (!el) return false;
-      if (el.matches('a, button, input, textarea, select, .vac-item, .marquee-chip, .service, .cert, .case-arrows button, .case-dots button, .seg button, .qm-chip')) return true;
-      return false;
-    };
-
+    let isHovering = false;
     const onOver = (e: MouseEvent) => {
-      let el = e.target as Element | null;
-      while (el && el !== document.body) {
-        if (isInteractive(el)) { blob.classList.add('hover'); dot.classList.add('hover'); return; }
-        el = el.parentElement;
+      const hovering = (e.target as Element | null)?.closest(INTERACTIVE_SELECTOR) != null;
+      if (hovering === isHovering) return;
+      isHovering = hovering;
+      blob.classList.toggle('hover', hovering);
+      dot.classList.toggle('hover', hovering);
+      if (!hovering) {
+        // Dot was frozen while hidden during hover — snap it to the cursor
+        // (not the blob) so it reappears exactly where it would have settled.
+        dx = mx; dy = my;
+        const rdx = Math.round(dx * 10) / 10, rdy = Math.round(dy * 10) / 10;
+        dot.style.translate = `${rdx}px ${rdy}px`;
+        lastDx = rdx; lastDy = rdy;
       }
-      blob.classList.remove('hover'); dot.classList.remove('hover');
     };
 
-    window.addEventListener('mousemove', onMove);
-    window.addEventListener('mouseover', onOver);
+    window.addEventListener('mousemove', onMove, { passive: true });
+    window.addEventListener('mouseover', onOver, { passive: true });
     window.addEventListener('mousedown', onDown);
     window.addEventListener('mouseup', onUp);
 
-    let raf: number;
-    const tick = () => {
-      bx += (mx - bx) * 0.16;
-      by += (my - by) * 0.16;
-      dx += (mx - dx) * 0.45;
-      dy += (my - dy) * 0.45;
-      blob.style.transform = `translate3d(${bx}px, ${by}px, 0) translate(-50%, -50%)`;
-      dot.style.transform = `translate3d(${dx}px, ${dy}px, 0) translate(-50%, -50%)`;
+    function tick() {
+      bx += (mx - bx) * blobEase;
+      by += (my - by) * blobEase;
+      if (!isHovering) {
+        dx += (mx - dx) * dotEase;
+        dy += (my - dy) * dotEase;
+      }
+
+      const rbx = Math.round(bx * 10) / 10, rby = Math.round(by * 10) / 10;
+      if (rbx !== lastBx || rby !== lastBy) {
+        blob!.style.translate = `${rbx}px ${rby}px`;
+        lastBx = rbx; lastBy = rby;
+      }
+      if (!isHovering) {
+        const rdx = Math.round(dx * 10) / 10, rdy = Math.round(dy * 10) / 10;
+        if (rdx !== lastDx || rdy !== lastDy) {
+          dot!.style.translate = `${rdx}px ${rdy}px`;
+          lastDx = rdx; lastDy = rdy;
+        }
+      }
+
+      const settled = Math.abs(mx - bx) < SETTLE_EPSILON && Math.abs(my - by) < SETTLE_EPSILON && (isHovering || (Math.abs(mx - dx) < SETTLE_EPSILON && Math.abs(my - dy) < SETTLE_EPSILON));
+      if (settled) {
+        running = false;
+        return;
+      }
       raf = requestAnimationFrame(tick);
-    };
+    }
+    running = true;
     raf = requestAnimationFrame(tick);
 
     return () => {

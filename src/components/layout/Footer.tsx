@@ -1,5 +1,5 @@
-import { Link } from 'react-router-dom';
-import { LogoMark } from '../shared/LogoMark';
+import { Link } from 'react-router-dom'
+import { LogoMark } from '../shared/LogoMark'
 
 export function Footer() {
   return (
@@ -16,16 +16,14 @@ export function Footer() {
               <li><Link to="/#about">О нас</Link></li>
               <li><Link to="/#cases">Проекты</Link></li>
               <li><Link to="/vacancies">Вакансии</Link></li>
-              <li><a href="#">Сертификаты</a></li>
+              <li><Link to="/#certificates">Сертификаты</Link></li>
             </ul>
           </div>
           <div>
             <h5>Услуги</h5>
             <ul>
-              <li><a href="#">Водоснабжение</a></li>
-              <li><a href="#">Отопление</a></li>
-              <li><a href="#">Газоснабжение</a></li>
-              <li><a href="#">Вентиляция</a></li>
+              <li>Водоснабжение</li>
+              <li>Газоснабжение</li>
             </ul>
           </div>
           <div>
