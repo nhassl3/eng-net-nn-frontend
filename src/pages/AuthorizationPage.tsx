@@ -1,11 +1,8 @@
-import { useEffect, useState } from 'react';
-import { BlueprintBackground } from '../components/layout/BlueprintBackground';
-import { Nav } from '../components/layout/Nav';
-import { CursorBlob } from '../components/shared/CursorBlob';
-import { Login } from '../components/authorization/Login';
-import { Registration } from '../components/authorization/Registration';
-import { useBackgroundEffects } from '../hooks/useBackgroundEffects';
-import '../styles/authorization.css';
+import { useEffect, useState } from 'react'
+import { Login } from '../components/authorization/Login'
+import { Registration } from '../components/authorization/Registration'
+import { Nav } from '../components/layout/Nav'
+import '../styles/authorization.css'
 
 type Mode = 'login' | 'register';
 
