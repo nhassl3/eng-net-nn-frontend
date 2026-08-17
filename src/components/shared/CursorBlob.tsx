@@ -87,8 +87,7 @@ export function CursorBlob() {
         }
       }
 
-      const settled = Math.abs(mx - bx) < SETTLE_EPSILON && Math.abs(my - by) < SETTLE_EPSILON &&
-        Math.abs(mx - dx) < SETTLE_EPSILON && Math.abs(my - dy) < SETTLE_EPSILON;
+      const settled = Math.abs(mx - bx) < SETTLE_EPSILON && Math.abs(my - by) < SETTLE_EPSILON && (isHovering || (Math.abs(mx - dx) < SETTLE_EPSILON && Math.abs(my - dy) < SETTLE_EPSILON));
       if (settled) {
         running = false;
         return;
