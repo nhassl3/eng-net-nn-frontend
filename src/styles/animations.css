@@ -78,7 +78,7 @@ body.has-cursor * { cursor: none !important; }
 }
 .cursor-blob.hover { scale: 1.778; background: rgba(31, 138, 91, 0.10); border-color: rgba(31, 138, 91, 0.6); }
 .cursor-blob.press { scale: 0.722; background: rgba(31, 138, 91, 0.18); }
-.cursor-dot.hover { opacity: 0; }
+.cursor-dot.hover { opacity: 0; visibility: hidden; transition-duration: 0s; }
 
 /* Fade-up utility */
 @keyframes fade-up {
