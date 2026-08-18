@@ -1,7 +1,11 @@
 import { Link } from 'react-router-dom'
+import { useAppDispatch } from '../../store/hooks'
+import { openServiceModal } from '../../store/slices/modalSlice'
 import { LogoMark } from '../shared/LogoMark'
 
 export function Footer() {
+  const dispatch = useAppDispatch();
+
   return (
     <footer className="footer">
       <div className="container">
@@ -22,8 +26,10 @@ export function Footer() {
           <div>
             <h5>Услуги</h5>
             <ul>
-              <li>Водоснабжение</li>
-              <li>Газоснабжение</li>
+              <li onClick={() => dispatch(openServiceModal('02'))}><Link to="/">Сети ЛK</Link></li>
+              <li onClick={() => dispatch(openServiceModal('03'))}><Link to="/">Сети КН</Link></li>
+              <li onClick={() => dispatch(openServiceModal('01'))}><Link to="/">Сети НВK</Link></li>
+              <li onClick={() => dispatch(openServiceModal('04'))}><Link to="/">Газоснабжение</Link></li>
             </ul>
           </div>
           <div>
