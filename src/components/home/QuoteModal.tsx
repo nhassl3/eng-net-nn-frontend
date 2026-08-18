@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
-import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import { closeQuote } from '../../store/slices/modalSlice';
+import { useEffect, useState } from 'react'
+import { useAppDispatch, useAppSelector } from '../../store/hooks'
+import { closeQuote } from '../../store/slices/modalSlice'
 
 interface FormData {
   name: string;
@@ -23,9 +23,17 @@ const DIRECTION_LABELS: Record<string, string> = {
 export function QuoteModal() {
   const dispatch = useAppDispatch();
   const open = useAppSelector((s) => s.modal.quoteOpen);
+  const presetDirection = useAppSelector((s) => s.modal.presetDirection);
   const [form, setForm] = useState<FormData>({ name: '', direction: '', desc: '', email: '' });
   const [errors, setErrors] = useState<Partial<FormData>>({});
   const [sent, setSent] = useState(false);
+
+  useEffect(() => {
+    if (open && presetDirection) {
+      setForm((f) => ({ ...f, direction: presetDirection }));
+      setErrors((er) => ({ ...er, direction: undefined }));
+    }
+  }, [open, presetDirection]);
 
   useEffect(() => {
     if (!open) return;
@@ -48,7 +56,7 @@ export function QuoteModal() {
     setErrors((er) => ({ ...er, [k]: undefined }));
   };
 
-  const submit = (e: React.FormEvent) => {
+  const submit = (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     const er: Partial<FormData> = {};
     if (form.name.trim().split(/\s+/).filter(Boolean).length < 2) er.name = 'Укажите имя и фамилию';

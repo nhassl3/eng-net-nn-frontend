@@ -33,6 +33,19 @@
   transform: translateY(8px); opacity: 0;
   transition: transform 0.25s ease, opacity 0.25s ease, color 0.2s ease;
 }
+.service .service-more {
+  background: none; border: none; padding: 0;
+  font-family: var(--font-mono); cursor: pointer;
+  text-align: left; align-self: flex-start;
+}
+.service .service-more::after {
+  content: '';
+  width: 12px; height: 12px;
+  background: currentColor;
+  display: inline-block;
+  margin-left: 2px;
+  clip-path: polygon(0 0, 70% 0, 100% 30%, 100% 100%, 30% 100%, 0 70%);
+}
 .service:hover .reveal { transform: none; opacity: 1; color: var(--accent); }
 .service .pipe-art {
   position: absolute; right: -20px; bottom: -20px;

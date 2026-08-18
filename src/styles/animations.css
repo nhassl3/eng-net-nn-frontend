@@ -113,3 +113,9 @@ body.has-cursor * { cursor: none !important; }
   .error-art { order: -1; }
   .error-art svg { max-width: 240px; }
 }
+
+@media (max-width: 430px) {
+  .services { grid-template-columns: 1fr; }
+  .service { padding: 24px 20px 28px; min-height: unset; }
+  .service .pipe-art { width: 100px; height: 100px; right: -16px; bottom: -16px; }
+}
