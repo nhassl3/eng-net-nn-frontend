@@ -6,6 +6,7 @@ import { Hero } from '../components/home/Hero'
 import { Partners } from '../components/home/Partners'
 import { QuoteModal } from '../components/home/QuoteModal'
 import { Services } from '../components/home/Services'
+import { ServicesModal } from '../components/home/ServicesModal'
 import { Stats } from '../components/home/Stats'
 import { Footer } from '../components/layout/Footer'
 import { Nav } from '../components/layout/Nav'
@@ -15,6 +16,7 @@ import { useAppSelector } from '../store/hooks'
 export function HomePage() {
   useScrollReveal();
   const quoteOpen = useAppSelector((s) => s.modal.quoteOpen);
+  const serviceIx = useAppSelector((s) => s.modal.serviceIx);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-style', 'b');
@@ -24,7 +26,7 @@ export function HomePage() {
 
   return (
     <>
-      <div className={quoteOpen ? 'app-blur' : ''}>
+      <div className={quoteOpen || serviceIx ? 'app-blur' : ''}>
         <Nav />
         <main>
           <Hero />
@@ -38,6 +40,7 @@ export function HomePage() {
         <Footer />
       </div>
       <QuoteModal />
+      <ServicesModal />
     </>
   );
 }
