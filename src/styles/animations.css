@@ -97,6 +97,7 @@ body.has-cursor * { cursor: none !important; }
   .sec-head { grid-template-columns: 1fr; }
   .services { grid-template-columns: repeat(2, 1fr); }
   .case { grid-template-columns: 1fr; }
+  .case-vis { aspect-ratio: 4/3; }
   .case-info { padding: 32px; }
   .stats { grid-template-columns: repeat(2, 1fr); }
   .stat:nth-child(2) { border-right: none; }
