@@ -11,7 +11,7 @@
 .reveal .cases-stage,
 .reveal .stats,
 .reveal .certs,
-.reveal .marquee-stage,
+.reveal .marquee-wrap,
 .reveal .cta-strip {
   opacity: 0;
   transform: translateY(40px);
@@ -21,14 +21,14 @@
 .reveal .cases-stage   { transition-delay: 0.32s; }
 .reveal .stats         { transition-delay: 0.32s; }
 .reveal .certs         { transition-delay: 0.32s; }
-.reveal .marquee-stage { transition-delay: 0.36s; }
+.reveal .marquee-wrap { transition-delay: 0.36s; }
 .reveal .cta-strip     { transition-delay: 0.18s; }
 .reveal.in .sec-head,
 .reveal.in .services,
 .reveal.in .cases-stage,
 .reveal.in .stats,
 .reveal.in .certs,
-.reveal.in .marquee-stage,
+.reveal.in .marquee-wrap,
 .reveal.in .cta-strip { opacity: 1; transform: none; }
 
 @media (prefers-reduced-motion: reduce) {
