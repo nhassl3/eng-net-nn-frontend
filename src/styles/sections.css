@@ -210,35 +210,102 @@
 }
 
 /* Partners marquee */
+.marquee-wrap { width: 100%; }
 .marquee-stage {
-  display: flex; flex-direction: column; gap: 16px;
-  width: 100%; overflow: hidden; padding: 12px 0;
-  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 8%, #000 92%, transparent 100%);
-          mask-image: linear-gradient(to right, transparent 0, #000 8%, #000 92%, transparent 100%);
+  --marquee-gap: 48px;
+  --marquee-mask-edge: 8%;
+  display: flex; flex-direction: column; gap: 20px;
+  width: 100%; padding: 12px 0;
+  overflow-x: auto; overscroll-behavior-x: contain;
+  scrollbar-width: none; -webkit-overflow-scrolling: touch;
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 var(--marquee-mask-edge), #000 calc(100% - var(--marquee-mask-edge)), transparent 100%);
+          mask-image: linear-gradient(to right, transparent 0, #000 var(--marquee-mask-edge), #000 calc(100% - var(--marquee-mask-edge)), transparent 100%);
 }
+.marquee-stage::-webkit-scrollbar { display: none; }
 .marquee { width: 100%; overflow: hidden; }
 @keyframes marquee-scroll {
   from { transform: translate3d(0, 0, 0); }
   to   { transform: translate3d(-50%, 0, 0); }
 }
+@keyframes marquee-scroll-rev {
+  from { transform: translate3d(-50%, 0, 0); }
+  to   { transform: translate3d(0, 0, 0); }
+}
 .marquee-track {
-  display: flex; gap: 14px; width: max-content;
+  display: flex; gap: var(--marquee-gap); width: max-content;
   animation: marquee-scroll linear infinite;
+  animation-duration: var(--marquee-duration, 60s);
   will-change: transform;
 }
-.marquee-rev { animation-direction: reverse; }
-.marquee:hover .marquee-track { animation-play-state: paused; }
-.marquee-chip {
-  display: inline-flex; align-items: center; gap: 12px;
-  padding: 14px 22px;
-  border: 1px solid var(--border); border-radius: 999px;
-  background: var(--bg-card); white-space: nowrap;
-  font-family: var(--font-mono); font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase;
-  color: var(--fg);
-  transition: border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+.marquee-track.marquee-rev { animation-name: marquee-scroll-rev; }
+.marquee-group {
+  display: flex; align-items: center; gap: var(--marquee-gap);
+  list-style: none; margin: 0; padding: 0; flex: 0 0 auto;
 }
-.marquee-chip:hover { border-color: var(--fg); color: var(--accent); transform: translateY(-2px); }
-.marquee-chip .brand-mark { color: var(--accent); flex: 0 0 28px; }
+.marquee-stage:hover .marquee-track,
+.marquee-stage.marquee-swiping .marquee-track,
+.marquee-track:has(:focus-visible) {
+  animation-play-state: paused;
+}
+.partner-item a {
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  padding: 8px 6px;
+  min-width: 140px;
+  text-decoration: none;
+  transition: transform 0.2s ease;
+}
+.partner-logo {
+  height: 38px; width: auto; max-width: 130px; object-fit: contain;
+  filter: grayscale(1) opacity(0.55);
+  transition: filter 0.2s ease;
+}
+.partner-logo-text {
+  display: flex; align-items: center; justify-content: center;
+  height: 38px; padding: 0 10px;
+  font-family: var(--font-mono); font-size: 13px; letter-spacing: 0.04em;
+  color: var(--fg-muted);
+  border: 1px dashed var(--border); border-radius: var(--radius-sm);
+  white-space: nowrap;
+}
+.partner-name {
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--fg-muted);
+  white-space: nowrap;
+  transition: color 0.2s ease;
+}
+.partner-item a:hover,
+.partner-item a:focus-visible {
+  transform: translateY(-2px);
+}
+.partner-item a:hover .partner-logo,
+.partner-item a:focus-visible .partner-logo {
+  filter: grayscale(0) opacity(1);
+}
+.partner-item a:hover .partner-logo-text,
+.partner-item a:focus-visible .partner-logo-text {
+  color: var(--fg); border-color: var(--fg);
+}
+.partner-item a:hover .partner-name,
+.partner-item a:focus-visible .partner-name {
+  color: var(--accent);
+}
+.partner-item a:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 4px; border-radius: var(--radius-sm);
+}
+
+@media (max-width: 720px) {
+  .marquee-stage {
+    --marquee-gap: 28px;
+    --marquee-mask-edge: 4%;
+  }
+  .partner-item a { min-width: 104px; }
+  .partner-logo { height: 28px; max-width: 96px; }
+  .partner-logo-text { height: 28px; font-size: 11px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track { animation: none; }
+}
 
 /* CTA strip */
 .cta-strip {
