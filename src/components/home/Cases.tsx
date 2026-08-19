@@ -1,7 +1,7 @@
-import { useEffect } from 'react';
-import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import { next, prev, setIndex } from '../../store/slices/casesSlice';
-import { CASES } from '../../data/cases';
+import { useEffect } from 'react'
+import { CASES } from '../../data/cases'
+import { useAppDispatch, useAppSelector } from '../../store/hooks'
+import { next, prev, setIndex } from '../../store/slices/casesSlice'
 
 const SLIDE_DELAY = 3000;
 
@@ -37,7 +37,7 @@ export function Cases() {
               <div className="case" key={i}>
                 <div className="case-vis">
                   <div className="placeholder">
-                    <span>{c.label}</span>
+                    <img src={c.photo} alt={c.label} loading={i === 0 ? 'eager' : 'lazy'} decoding="async" />
                   </div>
                 </div>
                 <div className="case-info">
