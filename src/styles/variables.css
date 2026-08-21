@@ -16,6 +16,10 @@
   --accent-soft: #E6F4ED;
   --accent-ink: #0F4A30;
 
+  --danger: #C4453B;
+  --danger-soft: rgba(196, 69, 59, 0.12);
+  --danger-ink: #8E2F27;
+
   --grid: rgba(11, 11, 14, 0.05);
   --grid-strong: rgba(11, 11, 14, 0.08);
   --blueprint: rgba(31, 138, 91, 0.18);

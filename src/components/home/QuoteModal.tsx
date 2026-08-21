@@ -1,14 +1,9 @@
 import { useEffect, useState } from 'react'
+import { type RequestPlan, requestPlan } from '../../api/plan'
 import { useAppDispatch, useAppSelector } from '../../store/hooks'
 import { closeQuote } from '../../store/slices/modalSlice'
 
-interface FormData {
-  name: string;
-  direction: string;
-  desc: string;
-  email: string;
-}
-
+// direction values are 1-based to match the DB; 0 means "not selected"
 const DIRECTIONS: [string, string][] = [
   ['nvk', 'Сети НВК'],
   ['lk', 'Сети ЛК'],
@@ -16,21 +11,27 @@ const DIRECTIONS: [string, string][] = [
   ['gas', 'Газоснабжение'],
 ];
 
-const DIRECTION_LABELS: Record<string, string> = {
-  nvk: 'Сети НВК', lk: 'Сети ЛК', kn: 'Сети КН', gas: 'Газоснабжение',
-};
+const directionKeyToId = (key: string): number => DIRECTIONS.findIndex(([k]) => k === key) + 1;
+const directionLabel = (id: number): string | undefined => DIRECTIONS[id - 1]?.[1];
+
+interface FromErrors {
+  full_name?: string;
+  direction?: string;
+  task_description?: string;
+  email_to_feedback?: string;
+}
 
 export function QuoteModal() {
   const dispatch = useAppDispatch();
   const open = useAppSelector((s) => s.modal.quoteOpen);
   const presetDirection = useAppSelector((s) => s.modal.presetDirection);
-  const [form, setForm] = useState<FormData>({ name: '', direction: '', desc: '', email: '' });
-  const [errors, setErrors] = useState<Partial<FormData>>({});
+  const [form, setForm] = useState<RequestPlan>({ full_name: '', direction: 0, task_description: '', email_to_feedback: '' });
+  const [errors, setErrors] = useState<Partial<FromErrors>>({});
   const [sent, setSent] = useState(false);
 
   useEffect(() => {
     if (open && presetDirection) {
-      setForm((f) => ({ ...f, direction: presetDirection }));
+      setForm((f) => ({ ...f, direction: directionKeyToId(presetDirection) }));
       setErrors((er) => ({ ...er, direction: undefined }));
     }
   }, [open, presetDirection]);
@@ -51,26 +52,35 @@ export function QuoteModal() {
 
   if (!open) return null;
 
-  const set = (k: keyof FormData) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const set = (k: keyof RequestPlan) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setForm((f) => ({ ...f, [k]: e.target.value }));
     setErrors((er) => ({ ...er, [k]: undefined }));
   };
 
-  const submit = (e: React.SubmitEvent<HTMLFormElement>) => {
+  const submit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const er: Partial<FormData> = {};
-    if (form.name.trim().split(/\s+/).filter(Boolean).length < 2) er.name = 'Укажите имя и фамилию';
-    if (!form.direction) er.direction = 'Выберите направление';
-    if (form.desc.trim().length < 10) er.desc = 'Опишите задачу подробнее (от 10 знаков)';
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) er.email = 'Проверьте e‑mail';
+    const er: Partial<FromErrors> = {};
+    if (form.full_name.trim().split(/\s+/).filter(Boolean).length < 2) er.full_name = 'Укажите имя и фамилию';
+    if (form.direction <= 0) er.direction = 'Выберите направление';
+    if (form.task_description.trim().length < 10) er.task_description = 'Опишите задачу подробнее (от 10 знаков)';
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email_to_feedback)) er.email_to_feedback = 'Проверьте e‑mail';
     setErrors(er);
     if (Object.keys(er).length) return;
-    setSent(true);
+    await requestPlan({
+        full_name: form.full_name,
+        direction: form.direction,
+        task_description: form.task_description,
+        email_to_feedback: form.email_to_feedback,
+      }).then(() => {
+        setSent(true);
+      }).catch((err) => {
+        console.error('Error submitting plan request:', err);
+      });
   };
 
   const close = () => {
     setSent(false);
-    setForm({ name: '', direction: '', desc: '', email: '' });
+    setForm({ full_name: '', direction: 0, task_description: '', email_to_feedback: '' });
     setErrors({});
     dispatch(closeQuote());
   };
@@ -92,8 +102,8 @@ export function QuoteModal() {
 
             <div className="field">
               <label>Имя и фамилия</label>
-              <input type="text" value={form.name} onChange={set('name')} placeholder="Иван Петров" autoFocus />
-              {errors.name && <div className="err">{errors.name}</div>}
+              <input type="text" value={form.full_name} onChange={set('full_name')} placeholder="Иван Петров" autoFocus />
+              {errors.full_name && <div className="err">{errors.full_name}</div>}
             </div>
 
             <div className="field">
@@ -103,9 +113,9 @@ export function QuoteModal() {
                   <button
                     type="button"
                     key={k}
-                    className={`qm-chip${form.direction === k ? ' active' : ''}`}
+                    className={`qm-chip${form.direction === directionKeyToId(k) ? ' active' : ''}`}
                     onClick={() => {
-                      setForm((f) => ({ ...f, direction: k }));
+                      setForm((f) => ({ ...f, direction: directionKeyToId(k) }));
                       setErrors((er) => ({ ...er, direction: undefined }));
                     }}
                   >
@@ -118,14 +128,14 @@ export function QuoteModal() {
 
             <div className="field">
               <label>Описание задачи</label>
-              <textarea value={form.desc} onChange={set('desc')} placeholder="Объект, объёмы, сроки, особые условия" rows={4} />
-              {errors.desc && <div className="err">{errors.desc}</div>}
+              <textarea value={form.task_description} onChange={set('task_description')} placeholder="Объект, объёмы, сроки, особые условия" rows={4} />
+              {errors.task_description && <div className="err">{errors.task_description}</div>}
             </div>
 
             <div className="field">
               <label>E‑mail для ответа</label>
-              <input type="email" value={form.email} onChange={set('email')} placeholder="you@company.ru" />
-              {errors.email && <div className="err">{errors.email}</div>}
+              <input type="email" value={form.email_to_feedback} onChange={set('email_to_feedback')} placeholder="you@company.ru" />
+              {errors.email_to_feedback && <div className="err">{errors.email_to_feedback}</div>}
             </div>
 
             <button type="submit" className="btn-submit">
@@ -141,8 +151,8 @@ export function QuoteModal() {
             </div>
             <h2>Заявка принята</h2>
             <p>
-              Спасибо, {form.name.split(/\s+/)[0]}. Инженер по направлению «{DIRECTION_LABELS[form.direction]}» подготовит КП
-              и пришлёт на <strong>{form.email}</strong> в течение рабочего дня.
+              Спасибо, {form.full_name.split(/\s+/)[0]}. Инженер по направлению «{directionLabel(form.direction)}» подготовит КП
+              и пришлёт на <strong>{form.email_to_feedback}</strong> в течение рабочего дня.
             </p>
             <button onClick={close} className="btn btn-primary" style={{ marginTop: 24 }}>
               Готово

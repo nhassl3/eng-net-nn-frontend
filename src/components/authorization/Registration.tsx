@@ -6,21 +6,39 @@ interface Props {
   onSwitch: () => void;
 }
 
+interface RegistrationForm {
+  fullName: string;
+  username: string;
+  email: string;
+  password: string;
+  confirm: string;
+}
+
+const initialForm: RegistrationForm = {
+  fullName: '',
+  username: '',
+  email: '',
+  password: '',
+  confirm: '',
+};
+
 export function Registration({ onSwitch }: Props) {
   const { register } = useAuth();
   const navigate = useNavigate();
-  const [name, setName] = useState('');
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirm, setConfirm] = useState('');
+  const [form, setForm] = useState<RegistrationForm>(initialForm);
   const [showPwd, setShowPwd] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  function updateField<K extends keyof RegistrationForm>(field: K, value: RegistrationForm[K]) {
+    setForm((prev) => ({ ...prev, [field]: value }));
+  }
+
   async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
+
+    const { fullName, username, email, password, confirm } = form;
 
     if (password !== confirm) {
       setError('Пароли не совпадают');
@@ -33,7 +51,7 @@ export function Registration({ onSwitch }: Props) {
 
     setLoading(true);
     try {
-      await register(name, username, email, password);
+      await register(fullName, username, email, password);
       navigate('/');
     } catch (err) {
       const errMsg = err instanceof Error ? err.message : 'Ошибка регистрации';
@@ -73,8 +91,8 @@ export function Registration({ onSwitch }: Props) {
           type="text"
           autoComplete="name"
           placeholder="Иван Иванов"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          value={form.fullName}
+          onChange={(e) => updateField('fullName', e.target.value)}
           required
         />
       </div>
@@ -87,8 +105,8 @@ export function Registration({ onSwitch }: Props) {
           type="text"
           autoComplete="username"
           placeholder="ivan_ivanov"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          value={form.username}
+          onChange={(e) => updateField('username', e.target.value)}
           required
         />
       </div>
@@ -101,8 +119,8 @@ export function Registration({ onSwitch }: Props) {
           type="email"
           autoComplete="email"
           placeholder="you@company.com"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          value={form.email}
+          onChange={(e) => updateField('email', e.target.value)}
           required
         />
       </div>
@@ -116,8 +134,8 @@ export function Registration({ onSwitch }: Props) {
             type={showPwd ? 'text' : 'password'}
             autoComplete="new-password"
             placeholder="••••••••"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            value={form.password}
+            onChange={(e) => updateField('password', e.target.value)}
             required
           />
           <button
@@ -141,8 +159,8 @@ export function Registration({ onSwitch }: Props) {
             type={showPwd ? 'text' : 'password'}
             autoComplete="new-password"
             placeholder="••••••••"
-            value={confirm}
-            onChange={(e) => setConfirm(e.target.value)}
+            value={form.confirm}
+            onChange={(e) => updateField('confirm', e.target.value)}
             required
           />
         </div>
