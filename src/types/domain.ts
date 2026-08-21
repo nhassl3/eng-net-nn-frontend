@@ -23,15 +23,16 @@ export interface Vacancy {
   updated_at: string;
 }
 
-export interface JobDirection {
-  name: string;
-  tags: string[];
-  description: string;
+// Профиль работы (job_directions) приходит слитно с вакансией — inner join на бэкенде
+export interface VacancyWithJd extends Vacancy {
+  jd_name: string;
+  jd_description: string;
+  jd_tags: string[];
 }
 
-export interface VacancyWithJd {
-  vacancy: Vacancy;
-  job_direction: JobDirection;
+export interface VacanciesWithJd {
+  vacancies: VacancyWithJd[];
+  total: number;
 }
 
 export interface Vacancies {

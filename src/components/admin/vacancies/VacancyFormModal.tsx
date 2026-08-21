@@ -24,7 +24,7 @@ interface FormErrors {
 
 const EMPTY: FormState = { name: '', description: '', required_exp: '', pay_day: '', skills: '' };
 
-const toForm = ({ vacancy: v }: VacancyWithJd): FormState => ({
+const toForm = (v: VacancyWithJd): FormState => ({
   name: v.name,
   description: v.description,
   required_exp: v.required_exp ?? '',
@@ -77,7 +77,7 @@ export function VacancyFormModal({ vacancies }: { vacancies: VacancyWithJd[] }) 
   // Сид формы при открытии: из уже загруженного списка, без лишнего запроса
   useEffect(() => {
     if (!open) return;
-    const source = isEdit ? vacancies.find((v) => v.vacancy.uuid === editId) : undefined;
+    const source = isEdit ? vacancies.find((v) => v.uuid === editId) : undefined;
     setForm(source ? toForm(source) : EMPTY);
     setErrors({});
     setDone(false);

@@ -7,11 +7,9 @@ import { formatDate, formatExp, formatMoney } from '../format'
 export function VacancyViewModal({ vacancies }: { vacancies: VacancyWithJd[] }) {
   const dispatch = useAppDispatch();
   const id = useAppSelector((s) => s.admin.vacancyViewId);
-  const item = id === null ? undefined : vacancies.find((v) => v.vacancy.uuid === id);
+  const vacancy = id === null ? undefined : vacancies.find((v) => v.uuid === id);
 
   const close = () => dispatch(closeVacancyView());
-  const vacancy = item?.vacancy;
-  const jd = item?.job_direction;
 
   return (
     <AdminModalShell
@@ -53,25 +51,25 @@ export function VacancyViewModal({ vacancies }: { vacancies: VacancyWithJd[] }) 
             </div>
           )}
 
-          {/* Профиль работы — приходит inner join'ом из job_directions */}
-          {jd && (
+          {/* Профиль работы — приходит слитно с вакансией из job_directions */}
+          {vacancy.jd_name && (
             <>
               <span className="kicker" style={{ marginTop: 8, display: 'inline-block' }}>
                 <span className="num">/ профиль работы</span>
               </span>
               <dl className="admin-kv">
                 <dt>Название</dt>
-                <dd>{jd.name || '—'}</dd>
+                <dd>{vacancy.jd_name || '—'}</dd>
 
                 <dt>Описание</dt>
-                <dd className="long">{jd.description || '—'}</dd>
+                <dd className="long">{vacancy.jd_description || '—'}</dd>
               </dl>
 
-              {jd.tags?.length > 0 && (
+              {vacancy.jd_tags?.length > 0 && (
                 <div className="field">
                   <label>Теги профиля</label>
                   <div className="qm-chips">
-                    {jd.tags.map((t) => (
+                    {vacancy.jd_tags.map((t) => (
                       <span key={t} className="qm-chip">{t}</span>
                     ))}
                   </div>

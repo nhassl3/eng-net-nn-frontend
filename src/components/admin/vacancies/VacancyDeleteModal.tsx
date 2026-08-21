@@ -9,7 +9,7 @@ import { ConfirmModal } from '../ConfirmModal'
 export function VacancyDeleteModal({ vacancies }: { vacancies: VacancyWithJd[] }) {
   const dispatch = useAppDispatch();
   const id = useAppSelector((s) => s.admin.vacancyDeleteId);
-  const vacancy = id === null ? undefined : vacancies.find((v) => v.vacancy.uuid === id)?.vacancy;
+  const vacancy = id === null ? undefined : vacancies.find((v) => v.uuid === id);
 
   // Возвращаем true, чтобы отличить успех от ошибки: run() резолвится в
   // undefined при ошибке, а deleteVacancy сама по себе Promise<void>

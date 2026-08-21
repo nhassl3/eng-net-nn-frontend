@@ -1,4 +1,4 @@
-import type { Respond, Responds, Vacancy, VacancyWithJd } from '../types/domain'
+import type { Respond, Responds, VacanciesWithJd, Vacancy, VacancyWithJd } from '../types/domain'
 import { apiFetch } from './client'
 
 export interface RespondInput	{
@@ -34,9 +34,8 @@ export interface UpdateVacancyInput {
 // list и get отдают вакансию вместе с профилем работы (inner join на job_directions)
 
 export async function getAllVacancies(): Promise<VacancyWithJd[]> {
-	const data = await apiFetch<VacancyWithJd[] | { vacancies: VacancyWithJd[] }>('/api/vacancies/');
-	// Принимаем и голый массив, и обёртку {vacancies,total} — контракт не зафиксирован
-	return Array.isArray(data) ? data : (data.vacancies ?? []);
+	const data = await apiFetch<VacanciesWithJd>('/api/vacancies/');
+	return data.vacancies ?? [];
 }
 
 export async function getVacancy(id: string): Promise<VacancyWithJd> {

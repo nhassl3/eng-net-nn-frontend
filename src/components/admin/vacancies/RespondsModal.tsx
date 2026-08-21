@@ -16,7 +16,7 @@ interface Props {
 export function RespondsModal({ vacancies, responds, state }: Props) {
   const dispatch = useAppDispatch();
   const id = useAppSelector((s) => s.admin.respondsVacancyId);
-  const vacancy = id === null ? undefined : vacancies.find((v) => v.vacancy.uuid === id)?.vacancy;
+  const vacancy = id === null ? undefined : vacancies.find((v) => v.uuid === id);
 
   // Фильтруем на клиенте — пер-вакансионного эндпоинта пока нет
   const list = useMemo(

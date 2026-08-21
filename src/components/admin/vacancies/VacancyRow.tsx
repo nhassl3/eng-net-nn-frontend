@@ -10,15 +10,13 @@ interface Props {
   onDelete: () => void;
 }
 
-export function VacancyRow({ item, respondCount, onView, onResponds, onEdit, onDelete }: Props) {
-  const { vacancy, job_direction: jd } = item;
-
+export function VacancyRow({ item: vacancy, respondCount, onView, onResponds, onEdit, onDelete }: Props) {
   return (
-    <article className="admin-row">
+    <article className="admin-row" onClick={onView}>
       <div className="admin-row-main">
         <h3>{vacancy.name}</h3>
         <div className="admin-row-meta">
-          {jd?.name && <span className="admin-badge accent">{jd.name}</span>}
+          {vacancy.jd_name && <span className="admin-badge accent">{vacancy.jd_name}</span>}
           <span>{formatMoney(vacancy.pay_day)}</span>
           <span>Опыт: {formatExp(vacancy.required_exp)}</span>
           <span>от {formatDate(vacancy.created_at)}</span>
@@ -27,10 +25,19 @@ export function VacancyRow({ item, respondCount, onView, onResponds, onEdit, onD
           )}
         </div>
         {vacancy.description && <p className="admin-row-excerpt">{vacancy.description}</p>}
+        {vacancy.jd_description && (
+          <p className="admin-row-excerpt" style={{ color: 'var(--fg-muted)' }}>{vacancy.jd_description}</p>
+        )}
+        {vacancy.jd_tags && vacancy.jd_tags.length > 0 && (
+          <div className="qm-chips">
+            {vacancy.jd_tags.map((t) => (
+              <span key={t} className="qm-chip">{t}</span>
+            ))}
+          </div>
+        )}
       </div>
 
-      <div className="admin-row-actions">
-        <button type="button" className="icon-btn" onClick={onView}>Просмотр</button>
+      <div className="admin-row-actions" onClick={(e) => e.stopPropagation()}>
         <button type="button" className="icon-btn" onClick={onResponds}>
           Отклики{respondCount !== null && respondCount > 0 ? ` · ${respondCount}` : ''}
         </button>
