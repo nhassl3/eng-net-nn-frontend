@@ -5,7 +5,7 @@ import { useAppDispatch, useAppSelector } from '../../../store/hooks'
 import {
   closeVacancyCreate, closeVacancyEdit, refreshAdminLists,
 } from '../../../store/slices/adminSlice'
-import type { Vacancy } from '../../../types/domain'
+import type { VacancyWithJd } from '../../../types/domain'
 import { AdminModalShell } from '../AdminModalShell'
 
 interface FormState {
@@ -24,7 +24,7 @@ interface FormErrors {
 
 const EMPTY: FormState = { name: '', description: '', required_exp: '', pay_day: '', skills: '' };
 
-const toForm = (v: Vacancy): FormState => ({
+const toForm = ({ vacancy: v }: VacancyWithJd): FormState => ({
   name: v.name,
   description: v.description,
   required_exp: v.required_exp ?? '',
@@ -48,7 +48,7 @@ function validate(form: FormState): FormErrors {
 }
 
 /** Одна модалка на создание и редактирование — формы идентичны. */
-export function VacancyFormModal({ vacancies }: { vacancies: Vacancy[] }) {
+export function VacancyFormModal({ vacancies }: { vacancies: VacancyWithJd[] }) {
   const dispatch = useAppDispatch();
   const createOpen = useAppSelector((s) => s.admin.vacancyCreateOpen);
   const editId = useAppSelector((s) => s.admin.vacancyEditId);
@@ -77,7 +77,7 @@ export function VacancyFormModal({ vacancies }: { vacancies: Vacancy[] }) {
   // Сид формы при открытии: из уже загруженного списка, без лишнего запроса
   useEffect(() => {
     if (!open) return;
-    const source = isEdit ? vacancies.find((v) => v.uuid === editId) : undefined;
+    const source = isEdit ? vacancies.find((v) => v.vacancy.uuid === editId) : undefined;
     setForm(source ? toForm(source) : EMPTY);
     setErrors({});
     setDone(false);

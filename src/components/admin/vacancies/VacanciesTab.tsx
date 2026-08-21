@@ -28,10 +28,12 @@ export function VacanciesTab() {
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     if (!q) return list;
-    return list.filter((v) =>
+    return list.filter(({ vacancy: v, job_direction: jd }) =>
       v.name.toLowerCase().includes(q) ||
       v.description.toLowerCase().includes(q) ||
-      v.skills?.some((s) => s.toLowerCase().includes(q))
+      v.skills?.some((s) => s.toLowerCase().includes(q)) ||
+      jd?.name?.toLowerCase().includes(q) ||
+      jd?.tags?.some((t) => t.toLowerCase().includes(q))
     );
   }, [list, search]);
 
@@ -75,15 +77,15 @@ export function VacanciesTab() {
 
       {vacancies.status === 'success' && filtered.length > 0 && (
         <div className="admin-list">
-          {filtered.map((v) => (
+          {filtered.map((item) => (
             <VacancyRow
-              key={v.uuid}
-              vacancy={v}
-              respondCount={responds.status === 'success' ? (respondsByVacancy.get(v.uuid) ?? 0) : null}
-              onView={() => dispatch(openVacancyView(v.uuid))}
-              onResponds={() => dispatch(openResponds(v.uuid))}
-              onEdit={() => dispatch(openVacancyEdit(v.uuid))}
-              onDelete={() => dispatch(openVacancyDelete(v.uuid))}
+              key={item.vacancy.uuid}
+              item={item}
+              respondCount={responds.status === 'success' ? (respondsByVacancy.get(item.vacancy.uuid) ?? 0) : null}
+              onView={() => dispatch(openVacancyView(item.vacancy.uuid))}
+              onResponds={() => dispatch(openResponds(item.vacancy.uuid))}
+              onEdit={() => dispatch(openVacancyEdit(item.vacancy.uuid))}
+              onDelete={() => dispatch(openVacancyDelete(item.vacancy.uuid))}
             />
           ))}
         </div>

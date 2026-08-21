@@ -2,13 +2,13 @@ import { useMemo } from 'react'
 import type { AsyncStatus } from '../../../hooks/useAsync'
 import { useAppDispatch, useAppSelector } from '../../../store/hooks'
 import { closeResponds, openRespondReply } from '../../../store/slices/adminSlice'
-import type { Respond, Vacancy } from '../../../types/domain'
+import type { Respond, VacancyWithJd } from '../../../types/domain'
 import { AdminModalShell } from '../AdminModalShell'
 import { AdminError, AdminLoading } from '../AdminState'
 import { formatDate } from '../format'
 
 interface Props {
-  vacancies: Vacancy[];
+  vacancies: VacancyWithJd[];
   responds: Respond[];
   state: { status: AsyncStatus; error: string | null; reload: () => void };
 }
@@ -16,7 +16,7 @@ interface Props {
 export function RespondsModal({ vacancies, responds, state }: Props) {
   const dispatch = useAppDispatch();
   const id = useAppSelector((s) => s.admin.respondsVacancyId);
-  const vacancy = id === null ? undefined : vacancies.find((v) => v.uuid === id);
+  const vacancy = id === null ? undefined : vacancies.find((v) => v.vacancy.uuid === id)?.vacancy;
 
   // Фильтруем на клиенте — пер-вакансионного эндпоинта пока нет
   const list = useMemo(

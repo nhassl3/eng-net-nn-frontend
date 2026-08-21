@@ -1,15 +1,17 @@
-import type { Vacancy } from '../../../types/domain'
 import { useAppDispatch, useAppSelector } from '../../../store/hooks'
 import { closeVacancyView, openVacancyEdit } from '../../../store/slices/adminSlice'
+import type { VacancyWithJd } from '../../../types/domain'
 import { AdminModalShell } from '../AdminModalShell'
 import { formatDate, formatExp, formatMoney } from '../format'
 
-export function VacancyViewModal({ vacancies }: { vacancies: Vacancy[] }) {
+export function VacancyViewModal({ vacancies }: { vacancies: VacancyWithJd[] }) {
   const dispatch = useAppDispatch();
   const id = useAppSelector((s) => s.admin.vacancyViewId);
-  const vacancy = id === null ? undefined : vacancies.find((v) => v.uuid === id);
+  const item = id === null ? undefined : vacancies.find((v) => v.vacancy.uuid === id);
 
   const close = () => dispatch(closeVacancyView());
+  const vacancy = item?.vacancy;
+  const jd = item?.job_direction;
 
   return (
     <AdminModalShell
@@ -49,6 +51,33 @@ export function VacancyViewModal({ vacancies }: { vacancies: Vacancy[] }) {
                 ))}
               </div>
             </div>
+          )}
+
+          {/* Профиль работы — приходит inner join'ом из job_directions */}
+          {jd && (
+            <>
+              <span className="kicker" style={{ marginTop: 8, display: 'inline-block' }}>
+                <span className="num">/ профиль работы</span>
+              </span>
+              <dl className="admin-kv">
+                <dt>Название</dt>
+                <dd>{jd.name || '—'}</dd>
+
+                <dt>Описание</dt>
+                <dd className="long">{jd.description || '—'}</dd>
+              </dl>
+
+              {jd.tags?.length > 0 && (
+                <div className="field">
+                  <label>Теги профиля</label>
+                  <div className="qm-chips">
+                    {jd.tags.map((t) => (
+                      <span key={t} className="qm-chip">{t}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </>
           )}
 
           <div className="admin-modal-actions">

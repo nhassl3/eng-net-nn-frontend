@@ -10,7 +10,7 @@ export interface User {
   role: UserRole;
   created_at: string;
   updated_at: string;
-}
+} 
 
 export interface Vacancy {
   uuid: string;
@@ -21,6 +21,17 @@ export interface Vacancy {
   pay_day: number;
   created_at: string;
   updated_at: string;
+}
+
+export interface JobDirection {
+  name: string;
+  tags: string[];
+  description: string;
+}
+
+export interface VacancyWithJd {
+  vacancy: Vacancy;
+  job_direction: JobDirection;
 }
 
 export interface Vacancies {

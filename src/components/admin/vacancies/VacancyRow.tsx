@@ -1,8 +1,8 @@
-import type { Vacancy } from '../../../types/domain'
+import type { VacancyWithJd } from '../../../types/domain'
 import { formatDate, formatExp, formatMoney } from '../format'
 
 interface Props {
-  vacancy: Vacancy;
+  item: VacancyWithJd;
   respondCount: number | null;
   onView: () => void;
   onResponds: () => void;
@@ -10,17 +10,20 @@ interface Props {
   onDelete: () => void;
 }
 
-export function VacancyRow({ vacancy, respondCount, onView, onResponds, onEdit, onDelete }: Props) {
+export function VacancyRow({ item, respondCount, onView, onResponds, onEdit, onDelete }: Props) {
+  const { vacancy, job_direction: jd } = item;
+
   return (
     <article className="admin-row">
       <div className="admin-row-main">
         <h3>{vacancy.name}</h3>
         <div className="admin-row-meta">
+          {jd?.name && <span className="admin-badge accent">{jd.name}</span>}
           <span>{formatMoney(vacancy.pay_day)}</span>
           <span>Опыт: {formatExp(vacancy.required_exp)}</span>
           <span>от {formatDate(vacancy.created_at)}</span>
           {respondCount !== null && respondCount > 0 && (
-            <span className="admin-badge accent">{respondCount} откл.</span>
+            <span className="admin-badge">{respondCount} откл.</span>
           )}
         </div>
         {vacancy.description && <p className="admin-row-excerpt">{vacancy.description}</p>}

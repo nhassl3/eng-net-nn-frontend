@@ -3,13 +3,13 @@ import { deleteVacancy } from '../../../api/vacancy'
 import { useAsyncAction } from '../../../hooks/useAsync'
 import { useAppDispatch, useAppSelector } from '../../../store/hooks'
 import { closeVacancyDelete, refreshAdminLists } from '../../../store/slices/adminSlice'
-import type { Vacancy } from '../../../types/domain'
+import type { VacancyWithJd } from '../../../types/domain'
 import { ConfirmModal } from '../ConfirmModal'
 
-export function VacancyDeleteModal({ vacancies }: { vacancies: Vacancy[] }) {
+export function VacancyDeleteModal({ vacancies }: { vacancies: VacancyWithJd[] }) {
   const dispatch = useAppDispatch();
   const id = useAppSelector((s) => s.admin.vacancyDeleteId);
-  const vacancy = id === null ? undefined : vacancies.find((v) => v.uuid === id);
+  const vacancy = id === null ? undefined : vacancies.find((v) => v.vacancy.uuid === id)?.vacancy;
 
   // Возвращаем true, чтобы отличить успех от ошибки: run() резолвится в
   // undefined при ошибке, а deleteVacancy сама по себе Promise<void>
