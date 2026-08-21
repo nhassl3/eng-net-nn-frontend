@@ -1,0 +1,351 @@
+/* ==========================================================================
+   Админ-панель
+   Переиспользует .container, .kicker, .btn*, .qm-*, .field, .auth-tab,
+   .auth-spinner, .auth-error. Здесь — только то, чего в системе не было.
+   ========================================================================== */
+
+/* --- Загрузка доступа (RequireAdmin) --- */
+.admin-boot {
+  min-height: calc(100vh - var(--nav-h));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+.admin-boot p {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--fg-muted);
+  letter-spacing: 0.04em;
+  margin: 0;
+}
+.admin-boot .auth-spinner {
+  width: 22px;
+  height: 22px;
+  border-width: 2px;
+}
+
+/* --- Шапка --- */
+.admin-head {
+  padding-top: 24px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 28px;
+}
+.admin-head h1 {
+  font-family: var(--font-display);
+  font-size: 38px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  margin: 8px 0 4px;
+}
+.admin-head .lede {
+  color: var(--fg-soft);
+  font-size: 15px;
+  margin: 0 0 24px;
+  max-width: 60ch;
+}
+
+.admin-tabs {
+  max-width: 420px;
+  margin-bottom: -1px;
+}
+.admin-tabs .auth-tab {
+  text-decoration: none;
+  text-align: center;
+  color: var(--fg-soft);
+}
+.admin-tabs .auth-tab.active { color: var(--fg); }
+
+/* --- Тулбар над списком --- */
+.admin-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.admin-toolbar .admin-count {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+.admin-toolbar .spacer { flex: 1; }
+.admin-search {
+  min-width: 220px;
+  padding: 9px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--fg);
+}
+.admin-search:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-soft);
+}
+
+/* --- Список записей --- */
+.admin-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.admin-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 20px;
+  align-items: center;
+  padding: 20px 24px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+.admin-row:hover {
+  border-color: var(--border-strong);
+  transform: translateX(2px);
+}
+.admin-row::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 16px;
+  bottom: 16px;
+  width: 2px;
+  background: var(--accent);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+.admin-row:hover::before { opacity: 1; }
+
+.admin-row-main { min-width: 0; }
+.admin-row-main h3 {
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  margin: 0 0 6px;
+  overflow-wrap: anywhere;
+}
+.admin-row-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--fg-muted);
+  letter-spacing: 0.04em;
+}
+.admin-row-excerpt {
+  margin: 8px 0 0;
+  font-size: 14px;
+  color: var(--fg-soft);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.admin-row-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+/* --- Мелкие кнопки-действия --- */
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--fg-soft);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+}
+.icon-btn:hover {
+  background: var(--bg-soft);
+  color: var(--fg);
+  border-color: var(--border-strong);
+}
+.icon-btn.danger:hover {
+  background: var(--danger-soft);
+  color: var(--danger-ink);
+  border-color: var(--danger);
+}
+.icon-btn svg { flex-shrink: 0; }
+
+/* --- Бейджи --- */
+.admin-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  background: var(--bg-soft);
+  color: var(--fg-soft);
+  border: 1px solid var(--border);
+}
+.admin-badge.accent {
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  border-color: transparent;
+}
+.admin-badge.muted {
+  background: transparent;
+  color: var(--fg-muted);
+  border-style: dashed;
+}
+
+/* --- Пустое состояние / ошибка --- */
+.admin-empty {
+  padding: 64px 24px;
+  text-align: center;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-lg);
+  color: var(--fg-muted);
+}
+.admin-empty h3 {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--fg);
+  margin: 0 0 8px;
+}
+.admin-empty p { margin: 0 0 20px; font-size: 14px; }
+
+.admin-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 64px 24px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--fg-muted);
+}
+
+.admin-error-box {
+  padding: 28px 24px;
+  border: 1px solid var(--danger);
+  background: var(--danger-soft);
+  border-radius: var(--radius);
+  text-align: center;
+}
+.admin-error-box p {
+  margin: 0 0 16px;
+  color: var(--danger-ink);
+  font-size: 14px;
+}
+
+/* --- Пары ключ-значение в модалках просмотра --- */
+.admin-kv {
+  display: grid;
+  grid-template-columns: minmax(120px, auto) 1fr;
+  gap: 12px 20px;
+  margin: 4px 0 8px;
+}
+.admin-kv dt {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--fg-muted);
+  padding-top: 2px;
+}
+.admin-kv dd {
+  margin: 0;
+  font-size: 15px;
+  color: var(--fg);
+  overflow-wrap: anywhere;
+}
+.admin-kv dd a { color: var(--accent); }
+.admin-kv .long {
+  white-space: pre-wrap;
+  font-size: 14px;
+  color: var(--fg-soft);
+  line-height: 1.6;
+}
+
+/* --- Список откликов внутри модалки --- */
+.admin-responds {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 8px;
+}
+.admin-respond {
+  padding: 16px 18px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-soft);
+}
+.admin-respond .row1 {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.admin-respond h4 {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 500;
+  margin: 0;
+}
+
+/* --- Вложенная модалка поверх другой --- */
+.qm-overlay.qm-stacked { z-index: 210; }
+
+/* --- Опасное действие --- */
+.btn-danger {
+  background: var(--danger);
+  color: #fff;
+  border-color: var(--danger);
+}
+.btn-danger:hover { background: var(--danger-ink); border-color: var(--danger-ink); }
+.qm-shell .btn-submit.btn-danger::before { background: var(--danger-ink); }
+
+.admin-modal-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 28px;
+}
+.admin-modal-actions > * { flex: 1; }
+
+/* --- Адаптив --- */
+@media (max-width: 860px) {
+  .admin-row {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .admin-row-actions { flex-wrap: wrap; }
+  .admin-row-actions .icon-btn { flex: 1; justify-content: center; }
+}
+
+@media (max-width: 640px) {
+  .admin-head h1 { font-size: 28px; }
+  .admin-tabs { max-width: none; }
+  .admin-toolbar .spacer { display: none; }
+  .admin-search { width: 100%; min-width: 0; }
+  .admin-kv { grid-template-columns: 1fr; gap: 4px 0; }
+  .admin-kv dd { margin-bottom: 12px; }
+  .admin-modal-actions { flex-direction: column; }
+}

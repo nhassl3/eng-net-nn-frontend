@@ -28,7 +28,7 @@ export function HomePage() {
 
   return (
     <>
-      <div className={quoteOpen || serviceIx || certsIdx ? 'app-blur' : ''}>
+      <div className={`app-shell${quoteOpen || serviceIx !== null || certsIdx !== null ? ' app-blur' : ''}`}>
         <Nav />
         <main>
           <Hero />

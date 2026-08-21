@@ -1,9 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
-import { LogoMark } from '../shared/LogoMark';
-import { useAppDispatch } from '../../store/hooks';
-import { openQuote } from '../../store/slices/modalSlice';
+import { useEffect, useRef, useState } from 'react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { useAuth } from '../../context/AuthContext'
+import { useAppDispatch } from '../../store/hooks'
+import { openQuote } from '../../store/slices/modalSlice'
+import { LogoMark } from '../shared/LogoMark'
 
 function scrollToSection(id: string) {
   const el = document.getElementById(id);
@@ -16,7 +16,7 @@ export function Nav() {
   const dispatch = useAppDispatch();
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, isAdmin, logout } = useAuth();
 
   useEffect(() => { setOpen(false); }, [location.pathname]);
 
@@ -75,6 +75,12 @@ export function Nav() {
           <a href="/#cases" onClick={(e) => handleSectionClick(e, 'cases')}>Кейсы</a>
           <a href="/#about" onClick={(e) => handleSectionClick(e, 'about')}>О компании</a>
           <Link to="/vacancies" className={isActive('/vacancies') ? 'active' : ''}>Вакансии</Link>
+          {isAuthenticated && !isAdmin && (
+            <Link to='/user-plans' className={isActive('/user-plans') ? 'active' : ''}>Мои заявки</Link>
+          )}
+          {isAdmin && (
+            <Link to='/admin' className={isActive('/admin') ? 'active' : ''}>Админ-панель</Link>
+          )}
         </nav>
         {isAuthenticated ? (
           <button type="button" className="nav-auth" onClick={handleLogout}>
@@ -83,10 +89,12 @@ export function Nav() {
         ) : (
           <Link to="/auth" className={`nav-auth${isActive('/auth') ? ' active' : ''}`}>Войти</Link>
         )}
-        <button type="button" className="nav-cta" onClick={handleCTA}>
-          <span className="dot" />
-          Получить КП
-        </button>
+        {!isAdmin && (
+          <button type="button" className="nav-cta" onClick={handleCTA}>
+            <span className="dot" />
+            Получить КП
+          </button>
+        )}
         <button
           type="button"
           className={`nav-burger${open ? ' open' : ''}`}
@@ -106,6 +114,12 @@ export function Nav() {
           <Link to="/vacancies" className={isActive('/vacancies') ? 'active' : ''} onClick={close}>
             Вакансии
           </Link>
+          {isAuthenticated && !isAdmin && (
+            <Link to='/user-plans' className={isActive('/user-plans') ? 'active' : ''}>Мои заявки</Link>
+          )}
+           {isAdmin && (
+            <Link to='/admin' className={isActive('/admin') ? 'active' : ''}>Админ-панель</Link>
+          )}
           {isAuthenticated ? (
             <button type="button" className="nav-auth" onClick={handleLogout}>
               Выйти ({user!.username})
@@ -115,12 +129,14 @@ export function Nav() {
               Войти
             </Link>
           )}
-          <div className="nav-mobile-cta">
+          {!isAdmin && (
+            <div className="nav-mobile-cta">
             <button type="button" className="nav-cta" onClick={handleCTA}>
               <span className="dot" />
               Получить КП
             </button>
           </div>
+          )}
         </div>
       </div>
 

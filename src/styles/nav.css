@@ -118,7 +118,7 @@
   border-top: 1px solid transparent;
 }
 .nav-mobile.open {
-  max-height: 360px;
+  max-height: 400px;
   border-top-color: var(--border);
 }
 .nav-mobile-inner {
@@ -130,6 +130,9 @@
   font-size: 16px; color: var(--fg-soft);
   transition: color 0.15s ease, background 0.15s ease;
   border-radius: var(--radius-sm);
+}
+.nav-mobile-inner .nav-auth {
+  margin: 8px 28px 0;
 }
 .nav-mobile-inner a:hover,
 .nav-mobile-inner a.active { color: var(--fg); }

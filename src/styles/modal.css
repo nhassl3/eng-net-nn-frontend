@@ -1,4 +1,11 @@
-.app-blur { filter: none; pointer-events: none; }
+/* Обёртка всего приложения (nav + main + footer). Модалки — её СОСЕДИ,
+   иначе filter создал бы для них containing block и заблюрил бы вместе с фоном. */
+.app-shell { transition: filter 0.28s ease; }
+.app-blur {
+  filter: blur(4px);
+  pointer-events: none;
+  user-select: none;
+}
 
 body.modal-open .marquee-track,
 body.modal-open .cases-track,
