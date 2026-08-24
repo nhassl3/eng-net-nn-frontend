@@ -1,7 +1,9 @@
 import { useMemo, useState } from 'react'
 import { useAppDispatch } from '../../../store/hooks'
 import {
-  openResponds, openVacancyCreate, openVacancyDelete, openVacancyEdit, openVacancyView,
+  openResponds, openVacancyCreate, openVacancyDelete, openVacancyEdit,
+  openVacancyJdCreate,
+  openVacancyView
 } from '../../../store/slices/adminSlice'
 import { AdminEmpty, AdminError, AdminLoading } from '../AdminState'
 import { AdminToolbar } from '../AdminToolbar'
@@ -38,9 +40,14 @@ export function VacanciesTab() {
   }, [list, search]);
 
   const createBtn = (
-    <button type="button" className="btn btn-primary" onClick={() => dispatch(openVacancyCreate())}>
-      Создать вакансию <span className="arrow" />
-    </button>
+    <>
+      <button type="button" className="btn btn-primary" onClick={() => dispatch(openVacancyCreate())}>
+        Создать вакансию <span className="arrow" />
+      </button>
+      <button type="button" className="btn btn-primary" onClick={() => dispatch(openVacancyJdCreate())}>
+        Создать профиль для вакансии <span className="arrow" />
+      </button>
+    </>
   );
 
   return (
