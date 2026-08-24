@@ -106,7 +106,7 @@ export function VacancyFormModal({ vacancies }: { vacancies: VacancyWithJd[] }) 
 
     setDone(true);
     dispatch(refreshAdminLists());
-    setTimeout(close, 1200);
+    setTimeout(close, 2100);
   };
 
   const pending = save.status === 'loading';
