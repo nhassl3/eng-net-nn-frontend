@@ -10,7 +10,7 @@ import { AdminModalShell } from '../AdminModalShell'
 
 interface FormState {
 	name: string;
-	tags: string[];
+	tags: string;
 	description: string;
 }
 
@@ -20,13 +20,16 @@ interface FormErrors {
 	description?: string;
 }
 
-const EMPTY: FormState = { name: '', tags: [], description: '' };
+const EMPTY: FormState = { name: '', tags: '', description: '' };
 
 const toForm = (v: VacancyJd): FormState => ({
 	name: v.jd_name,
-	tags: v.jd_tags,
+	tags: (v.jd_tags ?? []).join(', '),
 	description: v.jd_description,
 });
+
+const parseTags = (raw: string): string[] =>
+  raw.split(',').map((s) => s.trim()).filter(Boolean);
 
 function validate(form: FormState): FormErrors {
 	const er: FormErrors = {};
@@ -51,7 +54,7 @@ export function VacancyJdFormModal({ vacancies }: { vacancies: VacancyJd[] }) {
 	const save = useAsyncAction(async (state: FormState) => {
 		const payload = {
 			name: state.name.trim(),
-			tags: state.tags.sort(),
+			tags: parseTags(state.tags),
 			description: state.description.trim(),
 		};
 		return isEdit
@@ -92,7 +95,7 @@ export function VacancyJdFormModal({ vacancies }: { vacancies: VacancyJd[] }) {
 
 		setDone(true);
 		dispatch(refreshAdminLists());
-		setTimeout(close, 1200);
+		setTimeout(close, 2100);
 	};
 
 	const pending = save.status === 'loading';
@@ -126,7 +129,7 @@ export function VacancyJdFormModal({ vacancies }: { vacancies: VacancyJd[] }) {
 							type="text"
 							value={form.name}
 							onChange={set('name')}
-							placeholder="Ведущий инженер-проектировщик"
+							placeholder="Проектирование"
 							autoFocus
 						/>
 						{errors.name && <div className="err">{errors.name}</div>}
@@ -139,7 +142,7 @@ export function VacancyJdFormModal({ vacancies }: { vacancies: VacancyJd[] }) {
 							rows={5}
 							value={form.description}
 							onChange={set('description')}
-							placeholder="Задачи, проекты, условия работы"
+							placeholder="Чем конкретно занимается данный профиль работы?"
 						/>
 						{errors.description && <div className="err">{errors.description}</div>}
 					</div>
@@ -151,7 +154,7 @@ export function VacancyJdFormModal({ vacancies }: { vacancies: VacancyJd[] }) {
 							type="text"
 							value={form.tags}
 							onChange={set('tags')}
-							placeholder="AutoCAD, Revit, СП 30"
+							placeholder="Офис\Удаленка, Полный-день, Нижний-Новгород"
 						/>
 						<p className="auth-hint">Через запятую</p>
 					</div>
