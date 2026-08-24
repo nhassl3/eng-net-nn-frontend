@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react'
 import { Outlet } from 'react-router-dom'
 import { getAllPlans } from '../api/plan'
-import { getAllVacancies, getVacancyResponses } from '../api/vacancy'
+import { getAllVacancies, getAllVacanciesJd, getVacancyResponses } from '../api/vacancy'
 import { AdminTabs } from '../components/admin/AdminTabs'
 import type { AdminData } from '../components/admin/adminData'
 import { PlanReplyModal } from '../components/admin/plans/PlanReplyModal'
@@ -10,6 +10,7 @@ import { RespondReplyModal } from '../components/admin/vacancies/RespondReplyMod
 import { RespondsModal } from '../components/admin/vacancies/RespondsModal'
 import { VacancyDeleteModal } from '../components/admin/vacancies/VacancyDeleteModal'
 import { VacancyFormModal } from '../components/admin/vacancies/VacancyFormModal'
+import { VacancyJdFormModal } from '../components/admin/vacancies/VacancyJdFormModal'
 import { VacancyViewModal } from '../components/admin/vacancies/VacancyViewModal'
 import { Footer } from '../components/layout/Footer'
 import { Nav } from '../components/layout/Nav'
@@ -24,10 +25,12 @@ export function AdminPage() {
 
 	// Списки грузим здесь, а не в табах: модалки вынесены на этот уровень,
 	// но им нужны те же данные. Побочный плюс — переключение табов без перезапроса.
+	const vacanciesJd = useApiResource(getAllVacanciesJd, [refreshToken]);
 	const vacancies = useApiResource(getAllVacancies, [refreshToken]);
 	const responds = useApiResource(getVacancyResponses, [refreshToken]);
 	const plans = useApiResource(getAllPlans, [refreshToken]);
 
+	const vacancyJdList = useMemo(() => vacanciesJd.data ?? [], [vacancies.data]);
 	const vacancyList = useMemo(() => vacancies.data ?? [], [vacancies.data]);
 	const respondList = useMemo(() => responds.data?.respond_vacancies ?? [], [responds.data]);
 	const planList = useMemo(() => plans.data?.plans ?? [], [plans.data]);
@@ -77,6 +80,7 @@ export function AdminPage() {
 			</div>
 
 			{/* Соседи .app-shell, а не потомки — иначе blur лёг бы и на них */}
+			<VacancyJdFormModal vacancies={vacancyJdList} />
 			<VacancyViewModal vacancies={vacancyList} />
 			<VacancyFormModal vacancies={vacancyList} />
 			<VacancyDeleteModal vacancies={vacancyList} />
