@@ -8,6 +8,11 @@ interface AdminState {
   vacancyDeleteId: string | null;
   respondsVacancyId: string | null;
   respondReplyId: string | null;
+  // Профили
+  vacancyJdCreateOpen: boolean;
+  vacancyJdViewId: number | null;
+  vacancyJdEditId: number | null;
+  vacancyJdDeleteId: number | null;
   // Планы
   planViewId: string | null;
   planReplyId: string | null;
@@ -17,9 +22,13 @@ interface AdminState {
 
 const initialState: AdminState = {
   vacancyCreateOpen: false,
+  vacancyJdCreateOpen: false,
   vacancyViewId: null,
   vacancyEditId: null,
   vacancyDeleteId: null,
+  vacancyJdViewId: null,
+  vacancyJdEditId: null,
+  vacancyJdDeleteId: null,
   respondsVacancyId: null,
   respondReplyId: null,
   planViewId: null,
@@ -34,6 +43,9 @@ const adminSlice = createSlice({
     openVacancyCreate(state) { state.vacancyCreateOpen = true; },
     closeVacancyCreate(state) { state.vacancyCreateOpen = false; },
 
+    openVacancyJdCreate(state) { state.vacancyJdCreateOpen = true; },
+    closeVacancyJdCreate(state) { state.vacancyJdCreateOpen = false; },
+
     openVacancyView(state, action: PayloadAction<string>) { state.vacancyViewId = action.payload; },
     closeVacancyView(state) { state.vacancyViewId = null; },
 
@@ -42,6 +54,15 @@ const adminSlice = createSlice({
 
     openVacancyDelete(state, action: PayloadAction<string>) { state.vacancyDeleteId = action.payload; },
     closeVacancyDelete(state) { state.vacancyDeleteId = null; },
+
+    openVacancyJdView(state, action: PayloadAction<number>) { state.vacancyJdViewId = action.payload; },
+    closeVacancyJdView(state) { state.vacancyJdViewId = null; },
+
+    openVacancyJdEdit(state, action: PayloadAction<number>) {state.vacancyJdEditId = action.payload; },
+    closeVacancyJdEdit(state) { state.vacancyJdEditId = null; },
+
+    openVacancyJdDelete(state, action: PayloadAction<number>) {state.vacancyJdDeleteId = action.payload; },
+    closeVacancyJdDelete(state) { state.vacancyJdDeleteId = null; },
 
     openResponds(state, action: PayloadAction<string>) { state.respondsVacancyId = action.payload; },
     closeResponds(state) { state.respondsVacancyId = null; state.respondReplyId = null; },
@@ -64,9 +85,13 @@ const adminSlice = createSlice({
 
 export const {
   openVacancyCreate, closeVacancyCreate,
+  openVacancyJdCreate, closeVacancyJdCreate,
   openVacancyView, closeVacancyView,
   openVacancyEdit, closeVacancyEdit,
   openVacancyDelete, closeVacancyDelete,
+  openVacancyJdView, closeVacancyJdView,
+  openVacancyJdEdit, closeVacancyJdEdit,
+  openVacancyJdDelete, closeVacancyJdDelete,
   openResponds, closeResponds,
   openRespondReply, closeRespondReply,
   openPlanView, closePlanView,
