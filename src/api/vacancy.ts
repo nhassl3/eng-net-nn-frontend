@@ -1,4 +1,4 @@
-import type { Respond, Responds, VacanciesWithJd, Vacancy, VacancyWithJd } from '../types/domain'
+import type { Respond, Responds, VacanciesWithJd, Vacancy, VacancyJd, VacancyWithJd } from '../types/domain'
 import { apiFetch } from './client'
 
 export interface RespondInput	{
@@ -30,6 +30,18 @@ export interface UpdateVacancyInput {
 	pay_day?: number;
 }
 
+interface CreateVacancyJdInput {
+	name: string;
+	tags: string[];
+	description: string;
+}
+
+interface UpdateVacanctInput {
+	name?: string;
+	tags?: string[];
+	description?: string;
+}
+
 // Vacancy API
 // list и get отдают вакансию вместе с профилем работы (inner join на job_directions)
 
@@ -43,6 +55,16 @@ export async function getVacancy(id: string): Promise<VacancyWithJd> {
 	return data;
 }
 
+export async function getAllVacanciesJd(): Promise<VacancyJd[]> {
+	const data = await apiFetch<VacancyJd[]>('/api/admin/job_directions/');
+	return data;
+}
+
+export async function getVacancyJd(id: number): Promise<VacancyJd> {
+	const data = await apiFetch<VacancyJd>(`/api/admin/job_directions/${id}`);
+	return data;
+}
+
 // Admin panel vacancy management API
 
 export async function createVacancy(input: CreateVacancyInput): Promise<Vacancy> {
@@ -51,6 +73,28 @@ export async function createVacancy(input: CreateVacancyInput): Promise<Vacancy>
 		body: JSON.stringify(input),
 	});
 	return data;
+}
+
+export async function createVacancyJd(input: CreateVacancyJdInput): Promise<VacancyJd> {
+	const data = await apiFetch<VacancyJd>('/api/admin/job_directions/', {
+		method: 'POST',
+		body: JSON.stringify(input),
+	});
+	return data;
+}
+
+export async function updateVacancyJd(id: number, input: UpdateVacanctInput): Promise<VacancyJd> {
+	const data = await apiFetch<VacancyJd>(`/api/admin/job_directions/${id}`, {
+		method: 'UPDATE',
+		body: JSON.stringify(input),
+	});
+	return data;
+}
+
+export async function deleteVacancyJd(id: number): Promise<void> {
+	await apiFetch<void>(`/api/admin/job_directions/${id}`, {
+		method: "DELETE",
+	});
 }
 
 export async function updateVacancy(id: string, input: UpdateVacancyInput): Promise<Vacancy> {
