@@ -28,9 +28,6 @@ const toForm = (v: VacancyJd): FormState => ({
 	description: v.jd_description,
 });
 
-const parseTags = (raw: string): string[] =>
-	raw.split(',').map((s) => s.trim()).filter(Boolean);
-
 function validate(form: FormState): FormErrors {
 	const er: FormErrors = {};
 	if (form.name.trim().length < 3) er.name = 'Название от 3 символов';
