@@ -1,16 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { resolveErrorMessage } from '../api/errors'
 
 export type AsyncStatus = 'idle' | 'loading' | 'success' | 'error';
 
 /**
- * apiFetch кидает Error('SESSION_EXPIRED') и уже разослал 'auth:session-expired'.
- * AuthContext чистит юзера, RequireAdmin показывает 403 — здесь нужен только текст.
+ * apiFetch кидает ApiError (или Error('SESSION_EXPIRED')) и уже разослал
+ * 'auth:session-expired'. AuthContext чистит юзера, RequireAdmin показывает 403 —
+ * здесь нужен только переведённый текст, см. resolveErrorMessage.
  */
 export function toMessage(err: unknown): string {
-  if (!(err instanceof Error)) return 'Неизвестная ошибка';
-  if (err.message === 'SESSION_EXPIRED') return 'Сессия истекла. Войдите заново.';
-  if (err.message === 'Failed to fetch') return 'Сервер недоступен. Проверьте подключение.';
-  return err.message;
+  return resolveErrorMessage(err);
 }
 
 export interface ApiResource<T> {

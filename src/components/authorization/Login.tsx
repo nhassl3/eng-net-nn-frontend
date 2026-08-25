@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
+import { ApiError, resolveErrorMessage } from '../../api/errors'
 import { useAuth } from '../../context/AuthContext'
 
 interface Props {
@@ -24,10 +25,10 @@ export function Login({ onSwitch }: Props) {
       await login(userIn, password);
       navigate('/');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ошибка авторизации');
-			if (err instanceof Error && err.message.includes('401')) {
-				setFailed(true);
-			}
+      setError(resolveErrorMessage(err));
+      if (err instanceof ApiError && err.status === 401) {
+        setFailed(true);
+      }
     } finally {
       setLoading(false);
     }

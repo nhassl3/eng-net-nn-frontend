@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { type RequestPlan, requestPlan } from '../../api/plan'
+import { resolveErrorMessage } from '../../api/errors'
 import { useAppDispatch, useAppSelector } from '../../store/hooks'
 import { closeQuote } from '../../store/slices/modalSlice'
 
@@ -28,6 +29,7 @@ export function QuoteModal() {
   const [form, setForm] = useState<RequestPlan>({ full_name: '', direction: 0, task_description: '', email_to_feedback: '' });
   const [errors, setErrors] = useState<Partial<FromErrors>>({});
   const [sent, setSent] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   useEffect(() => {
     if (open && presetDirection) {
@@ -66,6 +68,7 @@ export function QuoteModal() {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email_to_feedback)) er.email_to_feedback = 'Проверьте e‑mail';
     setErrors(er);
     if (Object.keys(er).length) return;
+    setSubmitError(null);
     await requestPlan({
         full_name: form.full_name,
         direction: form.direction,
@@ -74,7 +77,7 @@ export function QuoteModal() {
       }).then(() => {
         setSent(true);
       }).catch((err) => {
-        console.error('Error submitting plan request:', err);
+        setSubmitError(resolveErrorMessage(err));
       });
   };
 
@@ -82,6 +85,7 @@ export function QuoteModal() {
     setSent(false);
     setForm({ full_name: '', direction: 0, task_description: '', email_to_feedback: '' });
     setErrors({});
+    setSubmitError(null);
     dispatch(closeQuote());
   };
 
@@ -99,6 +103,7 @@ export function QuoteModal() {
             <span className="kicker"><span className="num">/ заявка</span> · IPBuilding</span>
             <h2>Запрос коммерческого предложения</h2>
             <p className="qm-lede">Расскажите про объект — пришлём смету в течение 1 рабочего дня.</p>
+            {submitError && <p className="auth-error">{submitError}</p>}
 
             <div className="field">
               <label>Имя и фамилия</label>

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
+import { resolveErrorMessage } from '../../api/errors'
 import { useAuth } from '../../context/AuthContext'
 
 interface Props {
@@ -54,12 +55,7 @@ export function Registration({ onSwitch }: Props) {
       await register(fullName, username, email, password);
       navigate('/');
     } catch (err) {
-      const errMsg = err instanceof Error ? err.message : 'Ошибка регистрации';
-      if (errMsg === 'user already exists') {
-        setError('Пользователь с таким email уже существует');
-        return;
-      }
-      setError(errMsg);
+      setError(resolveErrorMessage(err));
     } finally {
       setLoading(false);
     }

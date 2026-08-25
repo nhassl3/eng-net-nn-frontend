@@ -1,4 +1,5 @@
 import { authStorage } from './authStorage'
+import { ApiError } from './errors'
 
 const API_BASE = (import.meta.env.VITE_API_URL as string | undefined) ?? '/api';
 
@@ -66,8 +67,8 @@ export async function apiFetch<T>(path: string, options?: RequestInit): Promise<
   }
 
   if (!res.ok) {
-    const body = (await res.json().catch(() => ({}))) as { message?: string };
-    throw new Error(body.message ?? `HTTP ${res.status}`);
+    const body = (await res.json().catch(() => ({}))) as { message?: string; code?: string };
+    throw new ApiError(res.status, body.code ?? null, body.message ?? null);
   }
 
   // 204 (DELETE) и другие пустые тела не парсятся как JSON
