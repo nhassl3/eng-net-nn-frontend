@@ -10,7 +10,9 @@ import { RespondReplyModal } from '../components/admin/vacancies/RespondReplyMod
 import { RespondsModal } from '../components/admin/vacancies/RespondsModal'
 import { VacancyDeleteModal } from '../components/admin/vacancies/VacancyDeleteModal'
 import { VacancyFormModal } from '../components/admin/vacancies/VacancyFormModal'
+import { VacancyJdDeleteModal } from '../components/admin/vacancies/VacancyJdDeleteModal'
 import { VacancyJdFormModal } from '../components/admin/vacancies/VacancyJdFormModal'
+import { VacancyJdViewModal } from '../components/admin/vacancies/VacancyJdViewModal'
 import { VacancyViewModal } from '../components/admin/vacancies/VacancyViewModal'
 import { Footer } from '../components/layout/Footer'
 import { Nav } from '../components/layout/Nav'
@@ -30,18 +32,22 @@ export function AdminPage() {
 	const responds = useApiResource(getVacancyResponses, [refreshToken]);
 	const plans = useApiResource(getAllPlans, [refreshToken]);
 
-	const vacancyJdList = useMemo(() => vacanciesJd.data ?? [], [vacancies.data]);
+	const vacancyJdList = useMemo(() => vacanciesJd.data ?? [], [vacanciesJd.data]);
 	const vacancyList = useMemo(() => vacancies.data ?? [], [vacancies.data]);
 	const respondList = useMemo(() => responds.data?.respond_vacancies ?? [], [responds.data]);
 	const planList = useMemo(() => plans.data?.plans ?? [], [plans.data]);
 
-	const outlet: AdminData = { vacancies, responds, plans };
+	const outlet: AdminData = { vacancies, vacanciesJd, responds, plans };
 
 	const anyModalOpen =
 		admin.vacancyCreateOpen ||
 		admin.vacancyViewId !== null ||
 		admin.vacancyEditId !== null ||
 		admin.vacancyDeleteId !== null ||
+		admin.vacancyJdCreateOpen ||
+		admin.vacancyJdViewId !== null ||
+		admin.vacancyJdEditId !== null ||
+		admin.vacancyJdDeleteId !== null ||
 		admin.respondsVacancyId !== null ||
 		admin.respondReplyId !== null ||
 		admin.planViewId !== null ||
@@ -67,7 +73,7 @@ export function AdminPage() {
 								<span className="kicker"><span className="num">/ управление</span> · IPBuilding</span>
 								<h1>Админ-панель</h1>
 								<p className="lede">
-									Управление вакансиями и обработка заявок на коммерческое предложение.
+									Управление вакансиями, их профилями и обработка заявок на коммерческое предложение.
 								</p>
 								<AdminTabs />
 							</header>
@@ -81,6 +87,8 @@ export function AdminPage() {
 
 			{/* Соседи .app-shell, а не потомки — иначе blur лёг бы и на них */}
 			<VacancyJdFormModal vacancies={vacancyJdList} />
+			<VacancyJdViewModal vacancies={vacancyJdList} />
+			<VacancyJdDeleteModal vacancies={vacancyJdList} />
 			<VacancyViewModal vacancies={vacancyList} />
 			<VacancyFormModal vacancies={vacancyList} />
 			<VacancyDeleteModal vacancies={vacancyList} />

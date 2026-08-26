@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { Provider } from 'react-redux'
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { PlansTab } from './components/admin/plans/PlansTab'
+import { VacanciesJdTab } from './components/admin/vacancies/VacanciesJdTab'
 import { VacanciesTab } from './components/admin/vacancies/VacanciesTab'
 import { CursorBlob } from './components/shared/CursorBlob'
 import { RequireAdmin } from './components/shared/RequireAdmin'
@@ -35,6 +36,7 @@ export default function App() {
           <Route path="/admin" element={<RequireAdmin><AdminPage /></RequireAdmin>}>
             <Route index element={<Navigate to="vacancies" replace />} />
             <Route path="vacancies" element={<VacanciesTab />} />
+            <Route path="vacancies_jd" element={<VacanciesJdTab />} />
             <Route path="plans" element={<PlansTab />} />
             <Route path="*" element={<Navigate to="/admin/vacancies" replace />} />
           </Route>

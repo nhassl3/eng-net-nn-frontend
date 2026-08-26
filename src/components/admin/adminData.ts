@@ -1,6 +1,6 @@
 import { useOutletContext } from 'react-router-dom'
 import type { ApiResource } from '../../hooks/useAsync'
-import type { Plans, Responds, VacancyWithJd } from '../../types/domain'
+import type { Plans, Responds, VacancyJd, VacancyWithJd } from '../../types/domain'
 
 /**
  * Данные грузит AdminPage, а не сами табы: модалки живут рядом с обёрткой
@@ -8,6 +8,7 @@ import type { Plans, Responds, VacancyWithJd } from '../../types/domain'
  */
 export interface AdminData {
   vacancies: ApiResource<VacancyWithJd[]>;
+  vacanciesJd: ApiResource<VacancyJd[]>;
   responds: ApiResource<Responds>;
   plans: ApiResource<Plans>;
 }

@@ -7,6 +7,7 @@ export function AdminTabs() {
   return (
     <div className="auth-tabs admin-tabs">
       <NavLink to="/admin/vacancies" className={cls}>Вакансии</NavLink>
+      <NavLink to="/admin/vacancies_jd" className={cls}>Профили для вакансий</NavLink>
       <NavLink to="/admin/plans" className={cls}>Заявки КП</NavLink>
     </div>
   );

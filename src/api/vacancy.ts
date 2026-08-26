@@ -42,6 +42,11 @@ interface UpdateVacanctInput {
 	description?: string;
 }
 
+interface VacancyJdList {
+	job_directions: VacancyJd[];
+	total: number;
+}
+
 // Vacancy API
 // list и get отдают вакансию вместе с профилем работы (inner join на job_directions)
 
@@ -56,8 +61,9 @@ export async function getVacancy(id: string): Promise<VacancyWithJd> {
 }
 
 export async function getAllVacanciesJd(): Promise<VacancyJd[]> {
-	const data = await apiFetch<VacancyJd[]>('/api/admin/job_directions/');
-	return data;
+	// Бэкенд отдаёт обёртку {job_directions,total}; массив принимаем на случай смены контракта
+	const data = await apiFetch<VacancyJdList | VacancyJd[]>('/api/admin/job_directions/');
+	return Array.isArray(data) ? data : data.job_directions ?? [];
 }
 
 export async function getVacancyJd(id: number): Promise<VacancyJd> {
@@ -85,7 +91,7 @@ export async function createVacancyJd(input: CreateVacancyJdInput): Promise<Vaca
 
 export async function updateVacancyJd(id: number, input: UpdateVacanctInput): Promise<VacancyJd> {
 	const data = await apiFetch<VacancyJd>(`/api/admin/job_directions/${id}`, {
-		method: 'UPDATE',
+		method: 'PUT',
 		body: JSON.stringify(input),
 	});
 	return data;

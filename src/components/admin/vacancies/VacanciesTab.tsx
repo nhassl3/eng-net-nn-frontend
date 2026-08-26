@@ -2,7 +2,6 @@ import { useMemo, useState } from 'react'
 import { useAppDispatch } from '../../../store/hooks'
 import {
   openResponds, openVacancyCreate, openVacancyDelete, openVacancyEdit,
-  openVacancyJdCreate,
   openVacancyView
 } from '../../../store/slices/adminSlice'
 import { AdminEmpty, AdminError, AdminLoading } from '../AdminState'
@@ -43,9 +42,6 @@ export function VacanciesTab() {
     <>
       <button type="button" className="btn btn-primary" onClick={() => dispatch(openVacancyCreate())}>
         Создать вакансию <span className="arrow" />
-      </button>
-      <button type="button" className="btn btn-primary" onClick={() => dispatch(openVacancyJdCreate())}>
-        Создать профиль для вакансии <span className="arrow" />
       </button>
     </>
   );
