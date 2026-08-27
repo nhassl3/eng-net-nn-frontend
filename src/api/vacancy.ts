@@ -1,4 +1,4 @@
-import type { Respond, Responds, VacanciesWithJd, Vacancy, VacancyWithJd } from '../types/domain'
+import type { Respond, Responds, VacanciesWithJd, Vacancy, VacancyJd, VacancyWithJd } from '../types/domain'
 import { apiFetch } from './client'
 
 export interface RespondInput	{
@@ -30,16 +30,53 @@ export interface UpdateVacancyInput {
 	pay_day?: number;
 }
 
+interface CreateVacancyJdInput {
+	name: string;
+	tags: string[];
+	description: string;
+}
+
+interface UpdateVacanctInput {
+	name?: string;
+	tags?: string[];
+	description?: string;
+}
+
+export interface VacancyJdList {
+	job_directions: VacancyJd[];
+}
+
+export interface ListParams {
+	limit?: number;
+	offset?: number;
+}
+
+/** Размер страницы списков в админке — одинаковый для вакансий и профилей работ */
+export const ADMIN_PAGE_SIZE = 20;
+
+// Дефолт для вызовов без явных параметров
+const DEFAULT_LIST_LIMIT = ADMIN_PAGE_SIZE;
+
 // Vacancy API
 // list и get отдают вакансию вместе с профилем работы (inner join на job_directions)
 
-export async function getAllVacancies(): Promise<VacancyWithJd[]> {
-	const data = await apiFetch<VacanciesWithJd>('/api/vacancies/');
-	return data.vacancies ?? [];
+export async function getAllVacancies({ limit = DEFAULT_LIST_LIMIT, offset = 0 }: ListParams = {}): Promise<VacanciesWithJd> {
+	const data = await apiFetch<VacanciesWithJd>(`/api/vacancies?limit=${limit}&offset=${offset}`);
+	return { vacancies: data.vacancies ?? [] };
 }
 
 export async function getVacancy(id: string): Promise<VacancyWithJd> {
 	const data = await apiFetch<VacancyWithJd>(`/api/vacancies/${id}`);
+	return data;
+}
+
+export async function getAllVacanciesJd({ limit = DEFAULT_LIST_LIMIT, offset = 0 }: ListParams = {}): Promise<VacancyJdList> {
+	const data = await apiFetch<VacancyJdList | VacancyJd[]>(`/api/admin/job_directions?limit=${limit}&offset=${offset}`);
+	return Array.isArray(data) ? { job_directions: data } : { job_directions: data.job_directions ?? [] };
+}
+
+export async function getVacancyJd(id: number): Promise<VacancyJd> {
+	const data = await apiFetch<VacancyJd>(`/api/admin/job_directions/${id}`);
 	return data;
 }
 
@@ -51,6 +88,28 @@ export async function createVacancy(input: CreateVacancyInput): Promise<Vacancy>
 		body: JSON.stringify(input),
 	});
 	return data;
+}
+
+export async function createVacancyJd(input: CreateVacancyJdInput): Promise<VacancyJd> {
+	const data = await apiFetch<VacancyJd>('/api/admin/job_directions/', {
+		method: 'POST',
+		body: JSON.stringify(input),
+	});
+	return data;
+}
+
+export async function updateVacancyJd(id: number, input: UpdateVacanctInput): Promise<VacancyJd> {
+	const data = await apiFetch<VacancyJd>(`/api/admin/job_directions/${id}`, {
+		method: 'PUT',
+		body: JSON.stringify(input),
+	});
+	return data;
+}
+
+export async function deleteVacancyJd(id: number): Promise<void> {
+	await apiFetch<void>(`/api/admin/job_directions/${id}`, {
+		method: "DELETE",
+	});
 }
 
 export async function updateVacancy(id: string, input: UpdateVacancyInput): Promise<Vacancy> {
@@ -82,7 +141,7 @@ export async function respond(input: RespondInput): Promise<string> {
 export async function getVacancyResponses(): Promise<Responds> {
 	const data = await apiFetch<Responds | Respond[]>('/api/admin/vacancies/');
 	return Array.isArray(data)
-		? { respond_vacancies: data, total: data.length }
+		? { respond_vacancies: data }
 		: { ...data, respond_vacancies: data.respond_vacancies ?? [] };
 }
 

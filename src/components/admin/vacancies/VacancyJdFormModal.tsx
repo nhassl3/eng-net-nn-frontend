@@ -1,0 +1,180 @@
+import { useEffect, useRef, useState } from 'react'
+import { createVacancyJd, updateVacancyJd } from '../../../api/vacancy'
+import { useAsyncAction } from '../../../hooks/useAsync'
+import { useAppDispatch, useAppSelector } from '../../../store/hooks'
+import {
+	closeVacancyJdCreate, closeVacancyJdEdit, refreshAdminLists
+} from '../../../store/slices/adminSlice'
+import type { VacancyJd } from '../../../types/domain'
+import { AdminModalShell } from '../AdminModalShell'
+
+interface FormState {
+	name: string;
+	tags: string;
+	description: string;
+}
+
+interface FormErrors {
+	name?: string;
+	tags?: string;
+	description?: string;
+}
+
+const EMPTY: FormState = { name: '', tags: '', description: '' };
+
+const toForm = (v: VacancyJd): FormState => ({
+	name: v.jd_name,
+	tags: (v.jd_tags ?? []).join(', '),
+	description: v.jd_description,
+});
+
+const parseTags = (raw: string): string[] =>
+  raw.split(',').map((s) => s.trim()).filter(Boolean);
+
+function validate(form: FormState): FormErrors {
+	const er: FormErrors = {};
+	if (form.name.trim().length < 3) er.name = 'Название от 3 символов';
+	if (form.description.trim().length < 20) er.description = 'Описание от 20 символов';
+	return er;
+}
+
+/** Одна модалка на создание и редактирование — формы идентичны. */
+export function VacancyJdFormModal({ vacancies }: { vacancies: VacancyJd[] }) {
+	const dispatch = useAppDispatch();
+	const createOpen = useAppSelector((s) => s.admin.vacancyJdCreateOpen);
+	const editId = useAppSelector((s) => s.admin.vacancyJdEditId);
+
+	const isEdit = editId !== null;
+	const open = createOpen || isEdit;
+
+	const [form, setForm] = useState<FormState>(EMPTY);
+	const [errors, setErrors] = useState<FormErrors>({});
+	const [done, setDone] = useState(false);
+
+	// Автозакрытие после успеха — отменяем, чтобы не закрыть модалку, открытую заново
+	const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+	useEffect(() => () => { if (closeTimer.current) clearTimeout(closeTimer.current); }, []);
+
+	const save = useAsyncAction(async (state: FormState) => {
+		const payload = {
+			name: state.name.trim(),
+			tags: parseTags(state.tags),
+			description: state.description.trim(),
+		};
+		return isEdit
+			// TODO(backend): уточнить назначение поля 'jd' — в Vacancy его нет
+			? updateVacancyJd(editId, payload)
+			: createVacancyJd({ ...payload});
+	});
+
+	// Сид формы при открытии: из уже загруженного списка, без лишнего запроса
+	useEffect(() => {
+		if (!open) return;
+		const source = isEdit ? vacancies.find((v) => v.id === editId) : undefined;
+		if (closeTimer.current) clearTimeout(closeTimer.current);
+		setForm(source ? toForm(source) : EMPTY);
+		setErrors({});
+		setDone(false);
+		save.reset();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [open, editId]);
+
+	const close = () => {
+		dispatch(isEdit ? closeVacancyJdEdit() : closeVacancyJdCreate());
+	};
+
+	const set = (k: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+		const { value } = e.target;
+		setForm((f) => ({ ...f, [k]: value }));
+		setErrors((er) => ({ ...er, [k]: undefined }));
+	};
+
+	const submit = async (e: React.SubmitEvent<HTMLFormElement>) => {
+		e.preventDefault();
+		const er = validate(form);
+		setErrors(er);
+		if (Object.keys(er).length) return;
+
+		const res = await save.run(form);
+		if (!res) return; // ошибка уже в save.error, форма сохранена
+
+		setDone(true);
+		dispatch(refreshAdminLists());
+		closeTimer.current = setTimeout(close, 2100);
+	};
+
+	const pending = save.status === 'loading';
+
+	return (
+		<AdminModalShell
+			open={open}
+			onClose={pending ? () => {} : close}
+			kicker={isEdit ? 'редактирование' : 'новый профиль вакансии'}
+			title={isEdit ? 'Изменить профиль вакансии' : 'Создать профиль вакансии'}
+			lede={isEdit ? undefined : 'Заполните карточку — профиль вакансии появится в списке сразу после сохранения.'}
+			scroll
+		>
+			{done ? (
+				<div className="qm-success">
+					<div className="check">
+						<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+							<polyline points="20 6 9 17 4 12" />
+						</svg>
+					</div>
+					<h2>{isEdit ? 'Изменения сохранены' : 'Вакансия создана'}</h2>
+				</div>
+			) : (
+				<form onSubmit={submit} noValidate>
+					{save.error && <p className="auth-error">{save.error}</p>}
+
+					<div className="field">
+						<label htmlFor="vac-name">Название</label>
+						<input
+							id="vac-name"
+							type="text"
+							value={form.name}
+							onChange={set('name')}
+							placeholder="Проектирование"
+							autoFocus
+						/>
+						{errors.name && <div className="err">{errors.name}</div>}
+					</div>
+
+					<div className="field">
+						<label htmlFor="vac-desc">Описание</label>
+						<textarea
+							id="vac-desc"
+							rows={5}
+							value={form.description}
+							onChange={set('description')}
+							placeholder="Чем конкретно занимается данный профиль работы?"
+						/>
+						{errors.description && <div className="err">{errors.description}</div>}
+					</div>
+
+					<div className="field">
+						<label htmlFor="vac-skills">Теги</label>
+						<input
+							id="vac-skills"
+							type="text"
+							value={form.tags}
+							onChange={set('tags')}
+							placeholder="Офис\Удаленка, Полный-день, Нижний-Новгород"
+						/>
+						<p className="auth-hint">Через запятую</p>
+					</div>
+
+					<div className="admin-modal-actions">
+						<button type="button" className="btn btn-ghost" onClick={close} disabled={pending}>
+							Отмена
+						</button>
+						<button type="submit" className="btn-submit" disabled={pending}>
+							{pending && <span className="auth-spinner" />}
+							{pending ? 'Сохраняем…' : isEdit ? 'Сохранить' : 'Создать'}
+						</button>
+					</div>
+				</form>
+			)}
+		</AdminModalShell>
+	);
+}

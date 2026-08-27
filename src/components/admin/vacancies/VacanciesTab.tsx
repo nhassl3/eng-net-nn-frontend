@@ -1,17 +1,21 @@
 import { useMemo, useState } from 'react'
 import { useAppDispatch } from '../../../store/hooks'
 import {
-  openResponds, openVacancyCreate, openVacancyDelete, openVacancyEdit, openVacancyView,
+  openResponds, openVacancyCreate, openVacancyDelete, openVacancyEdit,
+  openVacancyView
 } from '../../../store/slices/adminSlice'
 import { AdminEmpty, AdminError, AdminLoading } from '../AdminState'
 import { AdminToolbar } from '../AdminToolbar'
 import { useAdminData } from '../adminData'
+import { useInfiniteScroll } from '../useInfiniteScroll'
 import { VacancyRow } from './VacancyRow'
 
 export function VacanciesTab() {
   const dispatch = useAppDispatch();
   const { vacancies, responds } = useAdminData();
   const [search, setSearch] = useState('');
+
+  const list = vacancies.items;
 
   // Отклики приходят одним списком — раскладываем по вакансиям на клиенте,
   // так фича не зависит от наличия пер-вакансионного эндпоинта.
@@ -22,8 +26,6 @@ export function VacanciesTab() {
     }
     return map;
   }, [responds.data]);
-
-  const list = useMemo(() => vacancies.data ?? [], [vacancies.data]);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -37,10 +39,19 @@ export function VacanciesTab() {
     );
   }, [list, search]);
 
+  // Подгрузка следующей страницы, когда сентинел внизу списка входит во вьюпорт.
+  // Во время поиска не подгружаем — фильтр всё равно смотрит только на уже загруженное.
+  const sentinelRef = useInfiniteScroll(
+    !search && vacancies.hasMore && !vacancies.loadingMore,
+    vacancies.loadMore,
+  );
+
   const createBtn = (
-    <button type="button" className="btn btn-primary" onClick={() => dispatch(openVacancyCreate())}>
-      Создать вакансию <span className="arrow" />
-    </button>
+    <>
+      <button type="button" className="btn btn-primary" onClick={() => dispatch(openVacancyCreate())}>
+        Создать вакансию <span className="arrow" />
+      </button>
+    </>
   );
 
   return (
@@ -48,6 +59,7 @@ export function VacanciesTab() {
       <AdminToolbar
         count={list.length}
         countLabel="вакансий"
+        hasMore={vacancies.hasMore}
         search={search}
         onSearch={setSearch}
         searchPlaceholder="Поиск по названию или навыку"
@@ -76,19 +88,41 @@ export function VacanciesTab() {
       )}
 
       {vacancies.status === 'success' && filtered.length > 0 && (
-        <div className="admin-list">
-          {filtered.map((item) => (
-            <VacancyRow
-              key={item.uuid}
-              item={item}
-              respondCount={responds.status === 'success' ? (respondsByVacancy.get(item.uuid) ?? 0) : null}
-              onView={() => dispatch(openVacancyView(item.uuid))}
-              onResponds={() => dispatch(openResponds(item.uuid))}
-              onEdit={() => dispatch(openVacancyEdit(item.uuid))}
-              onDelete={() => dispatch(openVacancyDelete(item.uuid))}
-            />
-          ))}
-        </div>
+        <>
+          <div className="admin-list">
+            {filtered.map((item) => (
+              <div key={item.uuid} className="fade-up">
+                <VacancyRow
+                  item={item}
+                  respondCount={responds.status === 'success' ? (respondsByVacancy.get(item.uuid) ?? 0) : null}
+                  onView={() => dispatch(openVacancyView(item.uuid))}
+                  onResponds={() => dispatch(openResponds(item.uuid))}
+                  onEdit={() => dispatch(openVacancyEdit(item.uuid))}
+                  onDelete={() => dispatch(openVacancyDelete(item.uuid))}
+                />
+              </div>
+            ))}
+          </div>
+
+          {!search && vacancies.hasMore && (
+            <div ref={sentinelRef} className="admin-load-more">
+              {vacancies.loadingMore
+                ? <AdminLoading label="Загружаем ещё…" />
+                : (
+                  <button type="button" className="btn btn-ghost" onClick={vacancies.loadMore}>
+                    Загрузить ещё
+                  </button>
+                )}
+            </div>
+          )}
+
+          {search && vacancies.hasMore && (
+            <p className="admin-load-more admin-hint">
+              Поиск идёт по загруженным записям ({vacancies.items.length}).
+              Очистите запрос и прокрутите список, чтобы загрузить остальные.
+            </p>
+          )}
+        </>
       )}
     </>
   );
