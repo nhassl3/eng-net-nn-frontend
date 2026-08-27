@@ -6,6 +6,7 @@ import { VacanciesJdTab } from './components/admin/vacancies/VacanciesJdTab'
 import { VacanciesTab } from './components/admin/vacancies/VacanciesTab'
 import { CursorBlob } from './components/shared/CursorBlob'
 import { RequireAdmin } from './components/shared/RequireAdmin'
+import { RequireLogin } from './components/shared/RequireLogin'
 import { AuthProvider } from './context/AuthContext'
 import { AccessDeniedPage } from './pages/AccessDeniedPage'
 import { AdminPage } from './pages/AdminPage'
@@ -32,7 +33,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/vacancies" element={<VacanciesPage />} />
-          <Route path="/user-plans" element={<UserPlansPage />} />
+          <Route path="/user-plans" element={<RequireLogin><UserPlansPage /></RequireLogin>} />
           <Route path="/admin" element={<RequireAdmin><AdminPage /></RequireAdmin>}>
             <Route index element={<Navigate to="vacancies" replace />} />
             <Route path="vacancies" element={<VacanciesTab />} />
