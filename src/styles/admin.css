@@ -96,6 +96,18 @@
   gap: 12px;
 }
 
+.admin-load-more {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.admin-hint {
+  text-align: center;
+  font-size: 13px;
+  color: var(--fg-muted);
+}
+
 .admin-row {
   position: relative;
   display: grid;
@@ -124,6 +136,14 @@
   transition: opacity 0.2s ease;
 }
 .admin-row:hover::before { opacity: 1; }
+
+/* Строка кликабельна целиком, поэтому она же и фокусируемая — показываем фокус явно */
+.admin-row:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-color: var(--border-strong);
+}
+.admin-row:focus-visible::before { opacity: 1; }
 
 .admin-row-main { min-width: 0; }
 .admin-row-main h3 {

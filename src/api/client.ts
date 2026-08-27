@@ -19,7 +19,7 @@ async function rawFetch(path: string, options?: RequestInit): Promise<Response> 
   });
 }
 
-async function tryRefresh(): Promise<boolean> {
+async function requestRefresh(): Promise<boolean> {
   const refreshToken = authStorage.getRefreshToken();
   if (!refreshToken) return false;
 
@@ -34,6 +34,21 @@ async function tryRefresh(): Promise<boolean> {
   const tokens = (await res.json()) as { access_token: string; refresh_token: string };
   authStorage.setTokens(tokens);
   return true;
+}
+
+/**
+ * Single-flight: страница поднимает несколько запросов разом, и при протухшем access-токене
+ * все они получат 401 одновременно. Если бэкенд ротирует refresh-токены, второй и последующие
+ * обновления упадут на уже использованном токене и выкинут админа из сессии — поэтому
+ * все конкуренты ждут один и тот же промис.
+ */
+let refreshing: Promise<boolean> | null = null;
+
+function tryRefresh(): Promise<boolean> {
+  refreshing ??= requestRefresh()
+    .catch(() => false)
+    .finally(() => { refreshing = null; });
+  return refreshing;
 }
 
 export async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {

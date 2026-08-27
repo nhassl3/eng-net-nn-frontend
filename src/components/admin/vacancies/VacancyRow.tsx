@@ -1,5 +1,6 @@
 import type { VacancyWithJd } from '../../../types/domain'
 import { formatDate, formatExp, formatMoney } from '../format'
+import { rowActivationProps } from '../rowActivation'
 
 interface Props {
   item: VacancyWithJd;
@@ -12,7 +13,7 @@ interface Props {
 
 export function VacancyRow({ item: vacancy, respondCount, onView, onResponds, onEdit, onDelete }: Props) {
   return (
-    <article className="admin-row" onClick={onView}>
+    <article className="admin-row" {...rowActivationProps(onView)}>
       <div className="admin-row-main">
         <h3>{vacancy.name}</h3>
         <div className="admin-row-meta">
@@ -30,8 +31,8 @@ export function VacancyRow({ item: vacancy, respondCount, onView, onResponds, on
         )}
         {vacancy.jd_tags && vacancy.jd_tags.length > 0 && (
           <div className="qm-chips">
-            {vacancy.jd_tags.map((t) => (
-              <span key={t} className="qm-chip">{t}</span>
+            {vacancy.jd_tags.map((t, i) => (
+              <span key={`${t}-${i}`} className="qm-chip">{t}</span>
             ))}
           </div>
         )}

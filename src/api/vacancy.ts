@@ -42,17 +42,27 @@ interface UpdateVacanctInput {
 	description?: string;
 }
 
-interface VacancyJdList {
+export interface VacancyJdList {
 	job_directions: VacancyJd[];
-	total: number;
 }
+
+export interface ListParams {
+	limit?: number;
+	offset?: number;
+}
+
+/** Размер страницы списков в админке — одинаковый для вакансий и профилей работ */
+export const ADMIN_PAGE_SIZE = 20;
+
+// Дефолт для вызовов без явных параметров
+const DEFAULT_LIST_LIMIT = ADMIN_PAGE_SIZE;
 
 // Vacancy API
 // list и get отдают вакансию вместе с профилем работы (inner join на job_directions)
 
-export async function getAllVacancies(): Promise<VacancyWithJd[]> {
-	const data = await apiFetch<VacanciesWithJd>('/api/vacancies/');
-	return data.vacancies ?? [];
+export async function getAllVacancies({ limit = DEFAULT_LIST_LIMIT, offset = 0 }: ListParams = {}): Promise<VacanciesWithJd> {
+	const data = await apiFetch<VacanciesWithJd>(`/api/vacancies?limit=${limit}&offset=${offset}`);
+	return { vacancies: data.vacancies ?? [] };
 }
 
 export async function getVacancy(id: string): Promise<VacancyWithJd> {
@@ -60,10 +70,9 @@ export async function getVacancy(id: string): Promise<VacancyWithJd> {
 	return data;
 }
 
-export async function getAllVacanciesJd(): Promise<VacancyJd[]> {
-	// Бэкенд отдаёт обёртку {job_directions,total}; массив принимаем на случай смены контракта
-	const data = await apiFetch<VacancyJdList | VacancyJd[]>('/api/admin/job_directions/');
-	return Array.isArray(data) ? data : data.job_directions ?? [];
+export async function getAllVacanciesJd({ limit = DEFAULT_LIST_LIMIT, offset = 0 }: ListParams = {}): Promise<VacancyJdList> {
+	const data = await apiFetch<VacancyJdList | VacancyJd[]>(`/api/admin/job_directions?limit=${limit}&offset=${offset}`);
+	return Array.isArray(data) ? { job_directions: data } : { job_directions: data.job_directions ?? [] };
 }
 
 export async function getVacancyJd(id: number): Promise<VacancyJd> {
@@ -132,7 +141,7 @@ export async function respond(input: RespondInput): Promise<string> {
 export async function getVacancyResponses(): Promise<Responds> {
 	const data = await apiFetch<Responds | Respond[]>('/api/admin/vacancies/');
 	return Array.isArray(data)
-		? { respond_vacancies: data, total: data.length }
+		? { respond_vacancies: data }
 		: { ...data, respond_vacancies: data.respond_vacancies ?? [] };
 }
 

@@ -1,14 +1,15 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { createVacancy, updateVacancy } from '../../../api/vacancy'
 import { useAsyncAction } from '../../../hooks/useAsync'
 import { useAppDispatch, useAppSelector } from '../../../store/hooks'
 import {
   closeVacancyCreate, closeVacancyEdit, refreshAdminLists,
 } from '../../../store/slices/adminSlice'
-import type { VacancyWithJd } from '../../../types/domain'
+import type { VacancyJd, VacancyWithJd } from '../../../types/domain'
 import { AdminModalShell } from '../AdminModalShell'
 
 interface FormState {
+  jd: string;
   name: string;
   description: string;
   required_exp: string;
@@ -17,14 +18,16 @@ interface FormState {
 }
 
 interface FormErrors {
+  jd?: string;
   name?: string;
   description?: string;
   pay_day?: string;
 }
 
-const EMPTY: FormState = { name: '', description: '', required_exp: '', pay_day: '', skills: '' };
+const EMPTY: FormState = { jd: '', name: '', description: '', required_exp: '', pay_day: '', skills: '' };
 
 const toForm = (v: VacancyWithJd): FormState => ({
+  jd: String(v.id),
   name: v.name,
   description: v.description,
   required_exp: v.required_exp ?? '',
@@ -37,6 +40,7 @@ const parseSkills = (raw: string): string[] =>
 
 function validate(form: FormState): FormErrors {
   const er: FormErrors = {};
+  if (!form.jd) er.jd = 'Выберите профиль работы';
   if (form.name.trim().length < 3) er.name = 'Название от 3 символов';
   if (form.description.trim().length < 20) er.description = 'Описание от 20 символов';
 
@@ -48,7 +52,7 @@ function validate(form: FormState): FormErrors {
 }
 
 /** Одна модалка на создание и редактирование — формы идентичны. */
-export function VacancyFormModal({ vacancies }: { vacancies: VacancyWithJd[] }) {
+export function VacancyFormModal({ vacancies, vacanciesJd }: { vacancies: VacancyWithJd[]; vacanciesJd: VacancyJd[] }) {
   const dispatch = useAppDispatch();
   const createOpen = useAppSelector((s) => s.admin.vacancyCreateOpen);
   const editId = useAppSelector((s) => s.admin.vacancyEditId);
@@ -60,8 +64,13 @@ export function VacancyFormModal({ vacancies }: { vacancies: VacancyWithJd[] }) 
   const [errors, setErrors] = useState<FormErrors>({});
   const [done, setDone] = useState(false);
 
+  // Автозакрытие после успеха — отменяем, чтобы не закрыть модалку, открытую заново
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => { if (closeTimer.current) clearTimeout(closeTimer.current); }, []);
+
   const save = useAsyncAction(async (state: FormState) => {
     const payload = {
+      jd: Number(state.jd),
       name: state.name.trim(),
       description: state.description.trim(),
       required_exp: state.required_exp.trim(),
@@ -69,15 +78,15 @@ export function VacancyFormModal({ vacancies }: { vacancies: VacancyWithJd[] }) 
       skills: parseSkills(state.skills),
     };
     return isEdit
-      // TODO(backend): уточнить назначение поля 'jd' — в Vacancy его нет
       ? updateVacancy(editId, payload)
-      : createVacancy({ ...payload, jd: 0 });
+      : createVacancy(payload);
   });
 
   // Сид формы при открытии: из уже загруженного списка, без лишнего запроса
   useEffect(() => {
     if (!open) return;
     const source = isEdit ? vacancies.find((v) => v.uuid === editId) : undefined;
+    if (closeTimer.current) clearTimeout(closeTimer.current);
     setForm(source ? toForm(source) : EMPTY);
     setErrors({});
     setDone(false);
@@ -89,7 +98,7 @@ export function VacancyFormModal({ vacancies }: { vacancies: VacancyWithJd[] }) 
     dispatch(isEdit ? closeVacancyEdit() : closeVacancyCreate());
   };
 
-  const set = (k: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const set = (k: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { value } = e.target;
     setForm((f) => ({ ...f, [k]: value }));
     setErrors((er) => ({ ...er, [k]: undefined }));
@@ -106,7 +115,7 @@ export function VacancyFormModal({ vacancies }: { vacancies: VacancyWithJd[] }) 
 
     setDone(true);
     dispatch(refreshAdminLists());
-    setTimeout(close, 2100);
+    closeTimer.current = setTimeout(close, 2100);
   };
 
   const pending = save.status === 'loading';
@@ -132,6 +141,17 @@ export function VacancyFormModal({ vacancies }: { vacancies: VacancyWithJd[] }) 
       ) : (
         <form onSubmit={submit} noValidate>
           {save.error && <p className="auth-error">{save.error}</p>}
+
+          <div className="field">
+            <label htmlFor="vac-jd">Профиль работы</label>
+            <select id="vac-jd" value={form.jd} onChange={set('jd')}>
+              <option value="" disabled>Выберите профиль</option>
+              {vacanciesJd.map((jd) => (
+                <option key={jd.id} value={jd.id}>{jd.jd_name}</option>
+              ))}
+            </select>
+            {errors.jd && <div className="err">{errors.jd}</div>}
+          </div>
 
           <div className="field">
             <label htmlFor="vac-name">Название</label>

@@ -35,12 +35,10 @@ export interface VacancyWithJd extends Vacancy, VacancyJd {}
 
 export interface VacanciesWithJd {
   vacancies: VacancyWithJd[];
-  total: number;
 }
 
 export interface Vacancies {
   vacancies: Vacancy[];
-  total: number;
 }
 
 export interface Respond {
@@ -58,7 +56,6 @@ export interface Respond {
 
 export interface Responds {
   respond_vacancies: Respond[];
-  total: number;
 }
 
 export interface Plan {

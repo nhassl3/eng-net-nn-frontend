@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { createVacancyJd, updateVacancyJd } from '../../../api/vacancy'
 import { useAsyncAction } from '../../../hooks/useAsync'
 import { useAppDispatch, useAppSelector } from '../../../store/hooks'
@@ -51,6 +51,10 @@ export function VacancyJdFormModal({ vacancies }: { vacancies: VacancyJd[] }) {
 	const [errors, setErrors] = useState<FormErrors>({});
 	const [done, setDone] = useState(false);
 
+	// Автозакрытие после успеха — отменяем, чтобы не закрыть модалку, открытую заново
+	const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+	useEffect(() => () => { if (closeTimer.current) clearTimeout(closeTimer.current); }, []);
+
 	const save = useAsyncAction(async (state: FormState) => {
 		const payload = {
 			name: state.name.trim(),
@@ -67,6 +71,7 @@ export function VacancyJdFormModal({ vacancies }: { vacancies: VacancyJd[] }) {
 	useEffect(() => {
 		if (!open) return;
 		const source = isEdit ? vacancies.find((v) => v.id === editId) : undefined;
+		if (closeTimer.current) clearTimeout(closeTimer.current);
 		setForm(source ? toForm(source) : EMPTY);
 		setErrors({});
 		setDone(false);
@@ -95,7 +100,7 @@ export function VacancyJdFormModal({ vacancies }: { vacancies: VacancyJd[] }) {
 
 		setDone(true);
 		dispatch(refreshAdminLists());
-		setTimeout(close, 2100);
+		closeTimer.current = setTimeout(close, 2100);
 	};
 
 	const pending = save.status === 'loading';
