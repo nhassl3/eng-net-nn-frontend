@@ -21,7 +21,7 @@ export function PlanRow({ plan, onView, onReply }: Props) {
         <p className="admin-row-excerpt">{plan.task_description}</p>
       </div>
 
-      <div className="admin-row-actions">
+      <div className="admin-row-actions" onClick={(e) => e.stopPropagation()}>
         <button type="button" className="icon-btn" onClick={onReply}>Ответить</button>
       </div>
     </article>
