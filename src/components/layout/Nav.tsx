@@ -43,7 +43,7 @@ export function Nav() {
 
   const handleLogout = () => {
     close();
-    logout();
+    void logout();
     navigate('/');
   };
   const isActive = (path: string) => location.pathname === path;
@@ -115,10 +115,10 @@ export function Nav() {
             Вакансии
           </Link>
           {isAuthenticated && !isAdmin && (
-            <Link to='/user-plans' className={isActive('/user-plans') ? 'active' : ''}>Мои заявки</Link>
+            <Link to='/user-plans' className={isActive('/user-plans') ? 'active' : ''} onClick={close}>Мои заявки</Link>
           )}
-           {isAdmin && (
-            <Link to='/admin' className={isActive('/admin') ? 'active' : ''}>Админ-панель</Link>
+          {isAdmin && (
+            <Link to='/admin' className={isActive('/admin') ? 'active' : ''} onClick={close}>Админ-панель</Link>
           )}
           {isAuthenticated ? (
             <button type="button" className="nav-auth" onClick={handleLogout}>

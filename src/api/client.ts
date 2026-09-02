@@ -1,11 +1,31 @@
 import { authStorage } from './authStorage'
 import { ApiError } from './errors'
 
-const API_BASE = (import.meta.env.VITE_API_URL as string | undefined) ?? '/api';
+/**
+ * Только origin API — путь целиком задаёт вызывающий (`/api/...`, `/auth/...`).
+ * Пусто = тот же origin, что и фронтенд (вариант с reverse proxy).
+ */
+const API_BASE = (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/+$/, '') ?? '';
+
+/**
+ * Бэкенд требует этот заголовок на эндпоинтах, которые аутентифицируются одной
+ * лишь refresh-кукой (см. middleware.RequireRequestedWith). Заголовок
+ * non-safelisted, поэтому браузер обязан сделать preflight — а его он для
+ * чужого origin не пропустит. Форма с чужого сайта такой заголовок не выставит.
+ */
+const REQUESTED_WITH = 'fetch';
+
+/**
+ * На этих путях 401 — это ответ по существу («неверный пароль», «нет сессии»),
+ * а не протухший access-токен. Пропускать их через refresh-интерцептор нельзя:
+ * неудачный вход обнулял бы живую сессию и показывал «Сессия истекла».
+ */
+const AUTH_PATHS = ['/auth/login', '/auth/signup', '/auth/refresh'];
 
 function buildHeaders(extra?: HeadersInit): Record<string, string> {
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
+    'X-Requested-With': REQUESTED_WITH,
     ...(extra as Record<string, string>),
   };
   const token = authStorage.getAccessToken();
@@ -16,54 +36,63 @@ function buildHeaders(extra?: HeadersInit): Record<string, string> {
 async function rawFetch(path: string, options?: RequestInit): Promise<Response> {
   return fetch(`${API_BASE}${path}`, {
     ...options,
+    // Без этого refresh-кука не поедет на кросс-доменный API.
+    credentials: 'include',
     headers: buildHeaders(options?.headers),
   });
 }
 
 async function requestRefresh(): Promise<boolean> {
-  const refreshToken = authStorage.getRefreshToken();
-  if (!refreshToken) return false;
-
   const res = await fetch(`${API_BASE}/auth/refresh`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ refresh_token: refreshToken }),
+    credentials: 'include',
+    headers: { 'X-Requested-With': REQUESTED_WITH },
   });
 
   if (!res.ok) return false;
 
-  const tokens = (await res.json()) as { access_token: string; refresh_token: string };
-  authStorage.setTokens(tokens);
+  const session = (await res.json()) as { access_token: string; expires_in: number };
+  authStorage.setSession(session);
   return true;
 }
 
 /**
  * Single-flight: страница поднимает несколько запросов разом, и при протухшем access-токене
- * все они получат 401 одновременно. Если бэкенд ротирует refresh-токены, второй и последующие
- * обновления упадут на уже использованном токене и выкинут админа из сессии — поэтому
- * все конкуренты ждут один и тот же промис.
+ * все они получат 401 одновременно. Бэкенд ротирует refresh-токены и блэклистит старый,
+ * поэтому второе и последующие обновления упадут на уже отозванном токене и выкинут
+ * админа из сессии — все конкуренты ждут один и тот же промис.
  */
 let refreshing: Promise<boolean> | null = null;
 
-function tryRefresh(): Promise<boolean> {
+export function refreshSession(): Promise<boolean> {
   refreshing ??= requestRefresh()
     .catch(() => false)
     .finally(() => { refreshing = null; });
   return refreshing;
 }
 
+function endSession(): never {
+  authStorage.clear();
+  window.dispatchEvent(new Event('auth:session-expired'));
+  throw new Error('SESSION_EXPIRED');
+}
+
 export async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
+  const isAuthPath = AUTH_PATHS.some((p) => path.startsWith(p));
+
+  // Проактивное обновление: PASETO для клиента непрозрачен, но бэкенд отдаёт
+  // expires_in, так что 401 можно не дожидаться.
+  if (!isAuthPath && authStorage.isExpiringSoon() && !(await refreshSession())) {
+    endSession();
+  }
+
   let res = await rawFetch(path, options);
 
-  if (res.status === 401) {
-    const refreshed = await tryRefresh();
-    if (refreshed) {
-      res = await rawFetch(path, options);
-    } else {
-      authStorage.clear();
-      window.dispatchEvent(new Event('auth:session-expired'));
-      throw new Error('SESSION_EXPIRED');
-    }
+  // Страховка на случай, когда expires_in разошёлся с реальностью: часы клиента
+  // врут, вкладка спала, токен отозвали через logout в другой вкладке.
+  if (res.status === 401 && !isAuthPath) {
+    if (!(await refreshSession())) endSession();
+    res = await rawFetch(path, options);
   }
 
   if (!res.ok) {

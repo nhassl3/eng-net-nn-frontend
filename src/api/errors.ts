@@ -39,6 +39,10 @@ const ERROR_MESSAGES: Record<string, string> = {
   BAD_REQUEST: 'Некорректный запрос',
   VALIDATION_FAILED: 'Проверьте правильность заполнения формы',
   INTERNAL: 'Внутренняя ошибка сервера. Попробуйте позже',
+  TOKEN_EXPIRED: 'Сессия истекла. Войдите заново.',
+  INVALID_TOKEN: 'Неверный токен. Войдите заново.',
+  TOKEN_REVOKED: 'Сессия была завершена. Войдите заново.',
+  CROSS_SITE_BLOCKED: 'Запрос заблокирован политикой безопасности браузера. Попробуйте открыть сайт в отдельной вкладке.',
 };
 
 /**
@@ -64,6 +68,10 @@ const LEGACY_MESSAGE_CODES: Record<string, string> = {
   'file too large': 'FILE_TOO_LARGE',
   'invalid content type': 'INVALID_CONTENT_TYPE',
   'conflict with already created vacancies': 'DIRECTION_HAS_VACANCIES',
+  'expired token': 'TOKEN_EXPIRED',
+  'invalid token': 'INVALID_TOKEN',
+  'token revoked': 'TOKEN_REVOKED',
+  'cross-site request blocked': 'CROSS_SITE_BLOCKED',
 };
 
 /** Запасной перевод по HTTP-статусу, если код/строка не распознаны */

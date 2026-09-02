@@ -16,8 +16,13 @@ interface LoginInput {
   password: string;
 }
 
+/**
+ * Refresh-токена в ответе нет: бэкенд кладёт его в httpOnly-куку.
+ * В теле приходит только access-токен и его время жизни.
+ */
 export interface AuthResponse {
-  tokens: { access_token: string; refresh_token: string };
+  access_token: string;
+  expires_in: number;
   user: User;
 }
 
@@ -26,7 +31,7 @@ export async function login(input: LoginInput): Promise<AuthResponse> {
     method: 'POST',
     body: JSON.stringify(input),
   });
-  authStorage.setTokens(data.tokens);
+  authStorage.setSession(data);
   return data;
 }
 
@@ -35,7 +40,7 @@ export async function register(input: CreateUserInput): Promise<AuthResponse> {
     method: 'POST',
     body: JSON.stringify(input),
   });
-  authStorage.setTokens(data.tokens);
+  authStorage.setSession(data);
   return data;
 }
 
@@ -44,13 +49,10 @@ export async function getMe(): Promise<User> {
   return data.user;
 }
 
-export function refresh(refresh_token: string): Promise<{ access_token: string; refresh_token: string }> {
-  return apiFetch<{ access_token: string; refresh_token: string }>('/auth/refresh', {
-    method: 'POST',
-    body: JSON.stringify({ refresh_token }),
-  });
-}
-
-export function logout(): void {
-  authStorage.clear();
+/**
+ * Отзывает на сервере и access-, и refresh-токен и гасит куку. Обновление
+ * access-токена живёт в client.refreshSession — здесь его дублировать не нужно.
+ */
+export function logout(): Promise<{ message: string }> {
+  return apiFetch<{ message: string }>('/api/logout', { method: 'POST' });
 }
