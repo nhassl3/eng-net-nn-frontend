@@ -1,5 +1,6 @@
 import type { Plan } from '../../../types/domain'
 import { formatDate, planDirectionLabel } from '../format'
+import { rowActivationProps } from '../rowActivation'
 
 interface Props {
   plan: Plan;
@@ -9,7 +10,7 @@ interface Props {
 
 export function PlanRow({ plan, onView, onReply }: Props) {
   return (
-    <article className="admin-row">
+    <article className="admin-row" {...rowActivationProps(onView)}>
       <div className="admin-row-main">
         <h3>{plan.full_name}</h3>
         <div className="admin-row-meta">
@@ -20,8 +21,7 @@ export function PlanRow({ plan, onView, onReply }: Props) {
         <p className="admin-row-excerpt">{plan.task_description}</p>
       </div>
 
-      <div className="admin-row-actions">
-        <button type="button" className="icon-btn" onClick={onView}>Просмотр</button>
+      <div className="admin-row-actions" onClick={(e) => e.stopPropagation()}>
         <button type="button" className="icon-btn" onClick={onReply}>Ответить</button>
       </div>
     </article>
