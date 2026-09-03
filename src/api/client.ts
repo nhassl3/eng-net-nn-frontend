@@ -22,12 +22,14 @@ const REQUESTED_WITH = 'fetch';
  */
 const AUTH_PATHS = ['/auth/login', '/auth/signup', '/auth/refresh'];
 
-function buildHeaders(extra?: HeadersInit): Record<string, string> {
+function buildHeaders(body: BodyInit | null | undefined, extra?: HeadersInit): Record<string, string> {
   const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
     'X-Requested-With': REQUESTED_WITH,
-    ...(extra as Record<string, string>),
   };
+  // FormData (загрузка резюме) — Content-Type ставит браузер: только он знает boundary,
+  // а без него multipart на сервере не распарсится.
+  if (!(body instanceof FormData)) headers['Content-Type'] = 'application/json';
+  Object.assign(headers, extra as Record<string, string>);
   const token = authStorage.getAccessToken();
   if (token) headers['Authorization'] = `Bearer ${token}`;
   return headers;
@@ -38,7 +40,7 @@ async function rawFetch(path: string, options?: RequestInit): Promise<Response> 
     ...options,
     // Без этого refresh-кука не поедет на кросс-доменный API.
     credentials: 'include',
-    headers: buildHeaders(options?.headers),
+    headers: buildHeaders(options?.body, options?.headers),
   });
 }
 

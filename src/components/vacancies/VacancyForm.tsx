@@ -1,4 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { MAX_RESUME_SIZE, RESUME_EXTENSIONS, respond } from '../../api/vacancy'
+import type { RespondInput } from '../../api/vacancy'
+import { useAsyncAction } from '../../hooks/useAsync'
 import { useAppSelector } from '../../store/hooks'
 import type { VacancyWithJd } from '../../types/domain'
 
@@ -28,6 +31,16 @@ export function VacancyForm({ vacancies, loading }: VacancyFormProps) {
   const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>>>({});
   const [sent, setSent] = useState(false);
 
+  const send = useAsyncAction((input: RespondInput, resume: File) => respond(input, resume));
+
+  // Переключение вакансии сбрасывает экран успеха и состояние прошлой отправки — иначе успех
+  // с одной вакансии продолжает висеть при переходе на другую.
+  useEffect(() => {
+    setSent(false);
+    send.reset();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeId]);
+
   const set = (k: keyof FormData) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const target = e.target as HTMLInputElement;
     const value = target.type === 'checkbox'
@@ -39,17 +52,36 @@ export function VacancyForm({ vacancies, loading }: VacancyFormProps) {
     setErrors((er) => ({ ...er, [k]: undefined }));
   };
 
-  const submit = (e: React.SubmitEvent<HTMLFormElement>) => {
+  const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!vacancy) return;
     const er: Partial<Record<keyof FormData, string>> = {};
     if (data.name.trim().length < 2) er.name = 'Укажите имя';
     if (!/^[+\d][\d\s\-()]{8,}$/.test(data.phone)) er.phone = 'Проверьте телефон';
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) er.email = 'Проверьте e‑mail';
+    if (!data.file) er.file = 'Прикрепите резюме';
+    else if (data.file.size > MAX_RESUME_SIZE) er.file = 'Файл больше 10 МБ';
+    else if (!RESUME_EXTENSIONS.some((ext) => data.file!.name.toLowerCase().endsWith(ext))) {
+      er.file = 'Формат не поддерживается: PDF, DOC, DOCX, TXT, RTF';
+    }
     if (!data.consent) er.consent = 'Нужно согласие';
     if (Object.keys(er).length) { setErrors(er); return; }
-    
+
+    const res = await send.run({
+      vacancy_id: vacancy.uuid,
+      fullName: data.name,
+      phoneNumber: data.phone,
+      email: data.email,
+      city: data.city,
+      exp: data.exp,
+      description: data.message,
+    }, data.file!);
+    if (!res) return; // ошибка уже в send.error
+
     setSent(true);
   };
+
+  const pending = send.status === 'loading';
 
   // Пока список ещё грузится, карточку не убираем — иначе сетка .vac-grid прыгает при каждой
   // подгрузке страницы. null оставляем только для случая, когда список реально пуст.
@@ -82,6 +114,7 @@ export function VacancyForm({ vacancies, loading }: VacancyFormProps) {
           <button
             onClick={() => {
               setSent(false);
+              send.reset();
               setData({ name: '', phone: '', email: '', city: '', exp: '', message: '', file: null, consent: false });
             }}
             className="btn btn-ghost"
@@ -99,6 +132,8 @@ export function VacancyForm({ vacancies, loading }: VacancyFormProps) {
       <span className="kicker"><span className="num">/ заявка</span></span>
       <h2>Откликнуться: {vacancy.name}</h2>
       <p className="lede">Заполните форму — резюме можно прикрепить файлом или прислать ссылку в комментарии.</p>
+
+      {send.error && <p className="auth-error">{send.error}</p>}
 
       <div className="form-grid">
         <div className="field full">
@@ -136,14 +171,15 @@ export function VacancyForm({ vacancies, loading }: VacancyFormProps) {
           <textarea value={data.message} onChange={set('message')} placeholder="Расскажите кратко о проектах, на которых работали" />
         </div>
         <div className="field full">
-          <label>Резюме (PDF / DOCX)</label>
+          <label>Резюме (PDF / DOC / DOCX / TXT / RTF)</label>
           <label className="upload">
             <span>{data.file ? data.file.name : 'Перетащите файл сюда или нажмите'}</span>
             <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--fg-muted)' }}>
               {data.file ? `${Math.round(data.file.size / 1024)} КБ` : 'до 10 МБ'}
             </span>
-            <input type="file" accept=".pdf,.doc,.docx" onChange={set('file')} style={{ display: 'none' }} />
+            <input type="file" accept={RESUME_EXTENSIONS.join(',')} onChange={set('file')} style={{ display: 'none' }} />
           </label>
+          {errors.file && <div className="err">{errors.file}</div>}
         </div>
         <div className="full">
           <label className="consent">
@@ -156,8 +192,8 @@ export function VacancyForm({ vacancies, loading }: VacancyFormProps) {
           {errors.consent && <div className="err" style={{ marginTop: 4 }}>{errors.consent}</div>}
         </div>
         <div className="full" style={{ marginTop: 8 }}>
-          <button type="submit" className="btn-submit" disabled={!data.consent}>
-            Отправить заявку <span className="arrow" />
+          <button type="submit" className="btn-submit" disabled={!data.consent || pending}>
+            {pending ? <><span className="auth-spinner" /> Отправляем…</> : <>Отправить заявку <span className="arrow" /></>}
           </button>
         </div>
       </div>

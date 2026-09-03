@@ -29,7 +29,10 @@ const ERROR_MESSAGES: Record<string, string> = {
   INVALID_CREDENTIALS: 'Неверный логин или пароль',
   REDIS_NOT_FOUND: 'Внутренняя ошибка сервера. Попробуйте позже',
   DIRECTION_NOT_FOUND: 'Направление не найдено',
-  RESPOND_ALREADY_EXISTS: 'Отклик уже существует',
+  // Реально прилетает кандидату при повторном отклике на ту же вакансию (уникальный индекс
+  // email+vacancy_id) — VACANCIES_ALREADY_RESPOND в коде объявлен, но бэкенд его не возвращает.
+  RESPOND_ALREADY_EXISTS: 'Вы уже откликнулись на эту вакансию',
+  FILE_REQUIRED: 'Прикрепите резюме',
   VACANCY_ALREADY_EXISTS: 'Такая вакансия уже существует',
   RESPOND_VACANCIES_NOT_FOUND: 'Отклики на вакансии не найдены',
   RESPOND_VACANCY_NOT_FOUND: 'Отклик на вакансию не найден',
@@ -68,6 +71,8 @@ const LEGACY_MESSAGE_CODES: Record<string, string> = {
   'file too large': 'FILE_TOO_LARGE',
   'invalid content type': 'INVALID_CONTENT_TYPE',
   'conflict with already created vacancies': 'DIRECTION_HAS_VACANCIES',
+  'file is required': 'FILE_REQUIRED',
+  'invalid json body': 'BAD_REQUEST',
   'expired token': 'TOKEN_EXPIRED',
   'invalid token': 'INVALID_TOKEN',
   'token revoked': 'TOKEN_REVOKED',
@@ -88,8 +93,17 @@ const STATUS_MESSAGES: Record<number, string> = {
 
 export function resolveErrorMessage(err: unknown): string {
   if (err instanceof ApiError) {
-    const code = err.code ?? (err.serverMessage ? LEGACY_MESSAGE_CODES[err.serverMessage] : undefined);
-    if (code && ERROR_MESSAGES[code]) return ERROR_MESSAGES[code];
+    // Некоторые ручки бэкенда (напр. respond) кладут в `code` не код, а человеческий текст
+    // ошибки (баг конкретного хендлера — см. internal/transport/gin-http/errors.go) — поэтому
+    // сырой `code` тоже прогоняем через LEGACY_MESSAGE_CODES, а не только `serverMessage`.
+    const candidates = [
+      err.code,
+      err.code ? LEGACY_MESSAGE_CODES[err.code] : undefined,
+      err.serverMessage ? LEGACY_MESSAGE_CODES[err.serverMessage] : undefined,
+    ];
+    for (const code of candidates) {
+      if (code && ERROR_MESSAGES[code]) return ERROR_MESSAGES[code];
+    }
     if (STATUS_MESSAGES[err.status]) return STATUS_MESSAGES[err.status];
     return err.serverMessage ?? `HTTP ${err.status}`;
   }
