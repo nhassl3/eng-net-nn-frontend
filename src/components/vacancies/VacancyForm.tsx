@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { useAppSelector } from '../../store/hooks';
-import { VACANCIES } from '../../data/vacancies';
+import { useState } from 'react'
+import { useAppSelector } from '../../store/hooks'
+import type { VacancyWithJd } from '../../types/domain'
 
 interface FormData {
   name: string;
@@ -13,9 +13,14 @@ interface FormData {
   consent: boolean;
 }
 
-export function VacancyForm() {
+interface VacancyFormProps {
+  vacancies: VacancyWithJd[];
+  loading: boolean;
+}
+
+export function VacancyForm({ vacancies, loading }: VacancyFormProps) {
   const activeId = useAppSelector((s) => s.vacancy.activeId);
-  const vacancy = VACANCIES.find((v) => v.id === activeId)!;
+  const vacancy = vacancies.find((v) => v.uuid === activeId);
 
   const [data, setData] = useState<FormData>({
     name: '', phone: '', email: '', city: '', exp: '', message: '', file: null, consent: false,
@@ -34,7 +39,7 @@ export function VacancyForm() {
     setErrors((er) => ({ ...er, [k]: undefined }));
   };
 
-  const submit = (e: React.FormEvent) => {
+  const submit = (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     const er: Partial<Record<keyof FormData, string>> = {};
     if (data.name.trim().length < 2) er.name = 'Укажите имя';
@@ -42,8 +47,23 @@ export function VacancyForm() {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) er.email = 'Проверьте e‑mail';
     if (!data.consent) er.consent = 'Нужно согласие';
     if (Object.keys(er).length) { setErrors(er); return; }
+    
     setSent(true);
   };
+
+  // Пока список ещё грузится, карточку не убираем — иначе сетка .vac-grid прыгает при каждой
+  // подгрузке страницы. null оставляем только для случая, когда список реально пуст.
+  if (!vacancy) {
+    if (loading) {
+      return (
+        <div className="form-card" aria-busy="true">
+          <span className="kicker"><span className="num">/ заявка</span></span>
+          <h2>Загружаем вакансию…</h2>
+        </div>
+      );
+    }
+    return null;
+  }
 
   if (sent) {
     return (
@@ -77,7 +97,7 @@ export function VacancyForm() {
   return (
     <form className="form-card" onSubmit={submit}>
       <span className="kicker"><span className="num">/ заявка</span></span>
-      <h2>Откликнуться: {vacancy.title}</h2>
+      <h2>Откликнуться: {vacancy.name}</h2>
       <p className="lede">Заполните форму — резюме можно прикрепить файлом или прислать ссылку в комментарии.</p>
 
       <div className="form-grid">

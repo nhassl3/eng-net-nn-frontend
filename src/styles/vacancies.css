@@ -8,7 +8,20 @@
 .vac-hero p { color: var(--fg-soft); max-width: 56ch; }
 
 .vac-grid { display: grid; grid-template-columns: 1fr 1.4fr; gap: 48px; align-items: start; }
-.vac-list { display: flex; flex-direction: column; border-top: 1px solid var(--border); }
+.vac-list {
+  display: flex; flex-direction: column; border-top: 1px solid var(--border);
+  max-height: calc(100vh - 180px); overflow-y: auto; overscroll-behavior: contain;
+  scrollbar-gutter: stable; padding-right: 4px;
+  scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+}
+.vac-list::-webkit-scrollbar { width: 6px; }
+.vac-list::-webkit-scrollbar-track { background: transparent; }
+.vac-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+.vac-list::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+.vac-load-more {
+  display: flex; align-items: center; justify-content: center;
+  padding: 16px 0; font-size: 13px; color: var(--fg-muted);
+}
 .vac-item {
   padding: 24px 0 20px; border-bottom: 1px solid var(--border);
   display: flex; flex-direction: column; gap: 6px;
@@ -85,6 +98,8 @@
 @media (max-width: 1023px) {
   .vac-grid { grid-template-columns: 1fr; }
   .form-card { position: static; }
+  /* Одна колонка — форма больше не sticky рядом со списком, поэтому скроллит вся страница */
+  .vac-list { max-height: none; overflow: visible; }
 }
 
 @media (max-width: 767px) {

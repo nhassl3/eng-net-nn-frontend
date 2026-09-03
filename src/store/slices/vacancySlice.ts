@@ -1,12 +1,13 @@
 import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
-import { VACANCIES } from '../../data/vacancies';
 
 interface VacancyState {
   activeId: string;
 }
 
-const initialState: VacancyState = { activeId: VACANCIES[0].id };
+// Список грузится асинхронно (см. useVacancyList) — первая вакансия становится
+// активной, когда он приходит, а не здесь.
+const initialState: VacancyState = { activeId: '' };
 
 const vacancySlice = createSlice({
   name: 'vacancy',

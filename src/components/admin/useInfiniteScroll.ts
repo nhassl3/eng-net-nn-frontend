@@ -6,8 +6,12 @@ import { useEffect, useRef } from 'react'
  *
  * `onLoadMore` должен быть стабилен по идентичности (usePaginatedList.loadMore таков),
  * иначе наблюдатель будет пересоздаваться на каждом рендере.
+ *
+ * `root` — скроллящийся предок сентинела (по умолчанию `null` = вьюпорт страницы). Без него
+ * `rootMargin` считается от вьюпорта, а не от контейнера, и подгрузка внутри своего скролла
+ * (см. .vac-list) срабатывает только когда сентинел уже виден — без запаса на предзагрузку.
  */
-export function useInfiniteScroll(enabled: boolean, onLoadMore: () => void) {
+export function useInfiniteScroll(enabled: boolean, onLoadMore: () => void, root?: Element | null) {
   const sentinelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -18,11 +22,11 @@ export function useInfiniteScroll(enabled: boolean, onLoadMore: () => void) {
       (entries) => {
         if (entries[0]?.isIntersecting) onLoadMore();
       },
-      { rootMargin: '200px' },
+      { root, rootMargin: '200px' },
     );
     io.observe(el);
     return () => io.disconnect();
-  }, [enabled, onLoadMore]);
+  }, [enabled, onLoadMore, root]);
 
   return sentinelRef;
 }
