@@ -3,12 +3,12 @@ import { apiFetch } from './client'
 
 export interface RespondInput	{
 	vacancy_id: string;
-	fullName: string;
-	phoneNumber: string;
+	fullName?: string;
+	phoneNumber?: string;
 	email: string;
 	city: string;
-	exp: string;
-	description: string;
+	exp?: string;
+	description?: string;
 }
 
 export interface CreateVacancyInput {
@@ -128,10 +128,25 @@ export async function deleteVacancy(id: string): Promise<void> {
 
 // Respond to a vacancy API
 
-export async function respond(input: RespondInput): Promise<string> {
-	const data = await apiFetch<string>('/api/vacancy/respond', {
+export interface RespondResult {
+	message: string;
+}
+
+/** Лимиты совпадают с бэкендом (pkg/minio/minio.go) — клиентская проверка лишь режет заведомо плохой файл раньше отправки. */
+export const MAX_RESUME_SIZE = 10 * 1024 * 1024;
+export const RESUME_EXTENSIONS = ['.pdf', '.doc', '.docx', '.txt', '.rtf'];
+
+/**
+ * multipart/form-data: поле `json` (строка с RespondInput) и поле `file` (резюме, обязательно) —
+ * не JSON-body, так ждёт бэкенд (см. internal/transport/gin-http/vacancies.go: respond).
+ */
+export async function respond(input: RespondInput, resume: File): Promise<RespondResult> {
+	const form = new FormData();
+	form.append('json', JSON.stringify(input));
+	form.append('file', resume);
+	const data = await apiFetch<RespondResult>('/api/vacancies/respond', {
 		method: 'POST',
-		body: JSON.stringify(input),
+		body: form,
 	});
 	return data;
 }
