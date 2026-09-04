@@ -47,6 +47,7 @@ const ERROR_MESSAGES: Record<string, string> = {
   TOKEN_REVOKED: 'Сессия была завершена. Войдите заново.',
   CROSS_SITE_BLOCKED: 'Запрос заблокирован политикой безопасности браузера. Попробуйте открыть сайт в отдельной вкладке.',
   INVALID_PARAM: 'Некорректный параметр запроса',
+  EMPTY_DATA: "Нет данных для выполнения процесса. Проверьте правильность заполнения формы",
 };
 
 /**
@@ -79,6 +80,7 @@ const LEGACY_MESSAGE_CODES: Record<string, string> = {
   'token revoked': 'TOKEN_REVOKED',
   'cross-site request blocked': 'CROSS_SITE_BLOCKED',
   'invalid param': 'INVALID_PARAM',
+  'empty data': 'EMPTY_DATA',
 };
 
 /** Запасной перевод по HTTP-статусу, если код/строка не распознаны */
