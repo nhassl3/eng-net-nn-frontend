@@ -48,6 +48,7 @@ const ERROR_MESSAGES: Record<string, string> = {
   CROSS_SITE_BLOCKED: 'Запрос заблокирован политикой безопасности браузера. Попробуйте открыть сайт в отдельной вкладке.',
   INVALID_PARAM: 'Некорректный параметр запроса',
   EMPTY_DATA: "Нет данных для выполнения процесса. Проверьте правильность заполнения формы",
+  UNAUTHORIZED: 'Войдите в систему, чтобы продолжить',
 };
 
 /**
@@ -81,6 +82,7 @@ const LEGACY_MESSAGE_CODES: Record<string, string> = {
   'cross-site request blocked': 'CROSS_SITE_BLOCKED',
   'invalid param': 'INVALID_PARAM',
   'empty data': 'EMPTY_DATA',
+  'unauthorized': 'UNAUTHORIZED',
 };
 
 /** Запасной перевод по HTTP-статусу, если код/строка не распознаны */
