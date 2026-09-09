@@ -49,6 +49,7 @@ const ERROR_MESSAGES: Record<string, string> = {
   INVALID_PARAM: 'Некорректный параметр запроса',
   EMPTY_DATA: "Нет данных для выполнения процесса. Проверьте правильность заполнения формы",
   UNAUTHORIZED: 'Войдите в систему, чтобы продолжить',
+  INVALID_INPUT: 'Некорректные данные. Проверьте правильность заполнения формы',
 };
 
 /**
@@ -83,6 +84,7 @@ const LEGACY_MESSAGE_CODES: Record<string, string> = {
   'invalid param': 'INVALID_PARAM',
   'empty data': 'EMPTY_DATA',
   'unauthorized': 'UNAUTHORIZED',
+  'invalid input: violates a database constraint': 'INVALID_INPUT',
 };
 
 /** Запасной перевод по HTTP-статусу, если код/строка не распознаны */
