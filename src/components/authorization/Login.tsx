@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
 import { ApiError, resolveErrorMessage } from '../../api/errors'
-import { useAuth } from '../../context/AuthContext'
+import { useAuth, type IndetifierType } from '../../context/AuthContext'
 
 interface Props {
   onSwitch: () => void;
@@ -17,12 +17,30 @@ export function Login({ onSwitch }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [failed, setFailed] = useState(false);
 
+  const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  const usernameRegex = /^[a-zA-Z0-9_-]{3,30}$/;
+
+  function validateInput(input: string): IndetifierType {
+    if (uuidRegex.test(input)) return 'id';
+    if (emailRegex.test(input)) return 'email';
+    if (usernameRegex.test(input)) return 'username';
+    return 'unknown';
+  }
+
   async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
     setLoading(true);
     try {
-      await login(userIn, password);
+      const indentifierType = validateInput(userIn);
+      console.log(indentifierType);
+      if (indentifierType === 'unknown') {
+        setError(resolveErrorMessage(new ApiError(400, 'INVALID_INPUT', 'uncorrect identifier')));
+        setLoading(false);
+        return;
+      }
+      await login({ [indentifierType]: userIn, password });
       navigate('/');
     } catch (err) {
       setError(resolveErrorMessage(err));
