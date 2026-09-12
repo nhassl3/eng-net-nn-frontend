@@ -28,7 +28,7 @@ export function RequireLogin({ children }: { children: React.ReactNode }) {
 		);
 	}
 
-	if (!isAuthenticated) return <AuthorizationPage />;
+	if (!isAuthenticated) return <AuthorizationPage embedded />;
 
 	return <>{children}</>;
 }
