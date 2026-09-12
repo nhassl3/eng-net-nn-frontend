@@ -3,8 +3,8 @@ import { apiFetch } from './client'
 
 export interface RespondInput	{
 	vacancy_id: string;
-	fullName?: string;
-	phoneNumber?: string;
+	full_name?: string;
+	phone_number?: string;
 	email: string;
 	city: string;
 	exp?: string;
