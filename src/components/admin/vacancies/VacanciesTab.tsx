@@ -22,7 +22,7 @@ export function VacanciesTab() {
   const respondsByVacancy = useMemo(() => {
     const map = new Map<string, number>();
     for (const r of responds.data?.respond_vacancies ?? []) {
-      map.set(r.vacancyId, (map.get(r.vacancyId) ?? 0) + 1);
+      map.set(r.vacancy_id, (map.get(r.vacancy_id) ?? 0) + 1);
     }
     return map;
   }, [responds.data]);
