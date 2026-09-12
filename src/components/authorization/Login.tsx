@@ -39,7 +39,7 @@ export function Login({ onSwitch }: Props) {
         setLoading(false);
         return;
       }
-      await login({ [indentifierType]: userIn, password });
+      await login({ [indentifierType]: (indentifierType === 'id' ? userIn.toLowerCase() : userIn), password });
       navigate('/');
     } catch (err) {
       setError(resolveErrorMessage(err));
