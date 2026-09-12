@@ -34,7 +34,6 @@ export function Login({ onSwitch }: Props) {
     setLoading(true);
     try {
       const indentifierType = validateInput(userIn);
-      console.log(indentifierType);
       if (indentifierType === 'unknown') {
         setError(resolveErrorMessage(new ApiError(400, 'INVALID_INPUT', 'uncorrect identifier')));
         setLoading(false);
