@@ -20,7 +20,7 @@ export function RespondsModal({ vacancies, responds, state }: Props) {
 
   // Фильтруем на клиенте — пер-вакансионного эндпоинта пока нет
   const list = useMemo(
-    () => (id === null ? [] : responds.filter((r) => r.vacancyId === id)),
+    () => (id === null ? [] : responds.filter((r) => r.vacancy_id === id)),
     [responds, id],
   );
 
@@ -48,7 +48,7 @@ export function RespondsModal({ vacancies, responds, state }: Props) {
           {list.map((r) => (
             <article key={r.uuid} className="admin-respond">
               <div className="row1">
-                <h4>{r.fullName}</h4>
+                <h4>{r.full_name}</h4>
                 <span className="admin-badge muted">{formatDate(r.created_at)}</span>
               </div>
 
@@ -57,7 +57,7 @@ export function RespondsModal({ vacancies, responds, state }: Props) {
                 <dd><a href={`mailto:${r.email}`}>{r.email}</a></dd>
 
                 <dt>Телефон</dt>
-                <dd><a href={`tel:${r.phoneNumber}`}>{r.phoneNumber}</a></dd>
+                <dd><a href={`tel:${r.phone_number}`}>{r.phone_number}</a></dd>
 
                 <dt>Город</dt>
                 <dd>{r.city || '—'}</dd>
@@ -72,11 +72,11 @@ export function RespondsModal({ vacancies, responds, state }: Props) {
                   </>
                 )}
 
-                {r.resumeUrl && (
+                {r.resume_url && (
                   <>
                     <dt>Резюме</dt>
                     <dd>
-                      <a href={r.resumeUrl} target="_blank" rel="noreferrer noopener">
+                      <a href={r.resume_url} target="_blank" rel="noreferrer noopener">
                         Открыть файл
                       </a>
                     </dd>
