@@ -1,14 +1,16 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { ApiError, resolveErrorMessage } from '../../api/errors'
 import { useAuth, type IndetifierType } from '../../context/AuthContext'
+import { resolveNext } from './redirect'
 
 interface Props {
   onSwitch: () => void;
 }
 
-export function Login({ onSwitch }: Props) {
+export function Login({ onSwitch, embedded }: Props & { embedded?: boolean }) {
   const { login } = useAuth();
+  const { search } = useLocation();
   const navigate = useNavigate();
   const [userIn, setUserIn] = useState('');
   const [password, setPassword] = useState('');
@@ -40,7 +42,7 @@ export function Login({ onSwitch }: Props) {
         return;
       }
       await login({ [indentifierType]: (indentifierType === 'id' ? userIn.toLowerCase() : userIn), password });
-      navigate('/');
+      if (!embedded) navigate(resolveNext(search), { replace: true });
     } catch (err) {
       setError(resolveErrorMessage(err));
       if (err instanceof ApiError && err.status === 401) {

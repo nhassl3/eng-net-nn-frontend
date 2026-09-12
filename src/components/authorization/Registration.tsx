@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { resolveErrorMessage } from '../../api/errors'
 import { useAuth } from '../../context/AuthContext'
+import { resolveNext } from './redirect'
 
 interface Props {
   onSwitch: () => void;
@@ -23,9 +24,10 @@ const initialForm: RegistrationForm = {
   confirm: '',
 };
 
-export function Registration({ onSwitch }: Props) {
-  const { register } = useAuth();
+export function Registration({ onSwitch, embedded }: Props & { embedded?: boolean }) {
   const navigate = useNavigate();
+  const { search } = useLocation();
+  const { register } = useAuth();
   const [form, setForm] = useState<RegistrationForm>(initialForm);
   const [showPwd, setShowPwd] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -53,7 +55,7 @@ export function Registration({ onSwitch }: Props) {
     setLoading(true);
     try {
       await register(fullName, username, email, password);
-      navigate('/');
+      if (!embedded) navigate(resolveNext(search), { replace: true });
     } catch (err) {
       setError(resolveErrorMessage(err));
     } finally {
