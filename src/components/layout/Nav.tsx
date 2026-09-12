@@ -87,7 +87,7 @@ export function Nav() {
             Выйти ({user!.username})
           </button>
         ) : (
-          <Link to="/auth" className={`nav-auth${isActive('/auth') ? ' active' : ''}`}>Войти</Link>
+          <Link to={`/auth?next=${encodeURIComponent(location.pathname + location.search)}`} className={`nav-auth${isActive('/auth') ? ' active' : ''}`}>Войти</Link>
         )}
         {!isAdmin && (
           <button type="button" className="nav-cta" onClick={handleCTA}>
