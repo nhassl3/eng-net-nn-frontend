@@ -3,8 +3,8 @@ import { apiFetch } from './client'
 
 export interface RespondInput	{
 	vacancy_id: string;
-	fullName?: string;
-	phoneNumber?: string;
+	full_name?: string;
+	phone_number?: string;
 	email: string;
 	city: string;
 	exp?: string;
@@ -134,7 +134,7 @@ export interface RespondResult {
 
 /** Лимиты совпадают с бэкендом (pkg/minio/minio.go) — клиентская проверка лишь режет заведомо плохой файл раньше отправки. */
 export const MAX_RESUME_SIZE = 10 * 1024 * 1024;
-export const RESUME_EXTENSIONS = ['.pdf', '.doc', '.docx', '.txt', '.rtf'];
+export const RESUME_EXTENSIONS = ['.pdf', '.doc', '.docx', '.odt', '.rtf'];
 
 /**
  * multipart/form-data: поле `json` (строка с RespondInput) и поле `file` (резюме, обязательно) —

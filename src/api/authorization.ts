@@ -9,7 +9,7 @@ interface CreateUserInput {
   password: string;
 }
 
-interface LoginInput {
+export interface LoginInput {
   username?: string;
   email?: string;
   id?: string;

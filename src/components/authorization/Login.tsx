@@ -1,29 +1,60 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { ApiError, resolveErrorMessage } from '../../api/errors'
-import { useAuth } from '../../context/AuthContext'
+import { useAuth, type IndetifierType } from '../../context/AuthContext'
+import { resolveNext } from './redirect'
 
 interface Props {
   onSwitch: () => void;
 }
 
-export function Login({ onSwitch }: Props) {
+interface LoginErrors {
+  userIn?: string;
+  password?: string;
+}
+
+export function Login({ onSwitch, embedded }: Props & { embedded?: boolean }) {
   const { login } = useAuth();
+  const { search } = useLocation();
   const navigate = useNavigate();
   const [userIn, setUserIn] = useState('');
   const [password, setPassword] = useState('');
   const [showPwd, setShowPwd] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<LoginErrors>({});
   const [failed, setFailed] = useState(false);
+
+  const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  const usernameRegex = /^[a-zA-Z0-9_-]{3,30}$/;
+
+  function validateInput(input: string): IndetifierType {
+    if (uuidRegex.test(input)) return 'id';
+    if (emailRegex.test(input)) return 'email';
+    if (usernameRegex.test(input)) return 'username';
+    return 'unknown';
+  }
 
   async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
+
+    const er: LoginErrors = {};
+    const indentifierType = validateInput(userIn);
+    if (indentifierType === 'unknown') {
+      er.userIn = 'Введите корректный email, username (3-30 символов) или ID';
+    }
+    if (!password) {
+      er.password = 'Введите пароль';
+    }
+    setFieldErrors(er);
+    if (Object.keys(er).length) return;
+
     setLoading(true);
     try {
-      await login(userIn, password);
-      navigate('/');
+      await login({ [indentifierType]: (indentifierType === 'id' ? userIn.toLowerCase() : userIn), password });
+      if (!embedded) navigate(resolveNext(search), { replace: true });
     } catch (err) {
       setError(resolveErrorMessage(err));
       if (err instanceof ApiError && err.status === 401) {
@@ -46,9 +77,10 @@ export function Login({ onSwitch }: Props) {
           type="text"
           placeholder="you@company.com | username"
           value={userIn}
-          onChange={(e) => setUserIn(e.target.value)}
+          onChange={(e) => { setUserIn(e.target.value); setFieldErrors((f) => ({ ...f, userIn: undefined })); }}
           required
         />
+        {fieldErrors.userIn && <div className="err">{fieldErrors.userIn}</div>}
       </div>
 
       <div className="auth-field">
@@ -61,7 +93,7 @@ export function Login({ onSwitch }: Props) {
             autoComplete="current-password"
             placeholder="••••••••"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => { setPassword(e.target.value); setFieldErrors((f) => ({ ...f, password: undefined })); }}
             required
           />
           <button
@@ -84,6 +116,7 @@ export function Login({ onSwitch }: Props) {
             )}
           </button>
         </div>
+        {fieldErrors.password && <div className="err">{fieldErrors.password}</div>}
       </div>
 
       <button className="auth-submit" type="submit" disabled={loading}>

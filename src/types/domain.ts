@@ -1,6 +1,6 @@
 export const ADMIN_ROLE = 'admin';
 
-export type UserRole = 'admin' | 'user';
+export type UserRole = 'admin' | 'user' | 'partner';
 
 export interface User {
   uuid: string;
@@ -43,14 +43,14 @@ export interface Vacancies {
 
 export interface Respond {
   uuid: string;
-  fullName: string;
-  phoneNumber: string;
+  full_name: string;
+  phone_number: string;
   email: string;
   city: string;
   exp: string;
   description: string;
-  resumeUrl: string;
-  vacancyId: string;
+  resume_url: string;
+  vacancy_id: string;
   created_at: string;
 }
 

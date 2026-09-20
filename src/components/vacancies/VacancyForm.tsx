@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import { MAX_RESUME_SIZE, RESUME_EXTENSIONS, respond } from '../../api/vacancy'
 import type { RespondInput } from '../../api/vacancy'
+import { MAX_RESUME_SIZE, RESUME_EXTENSIONS, respond } from '../../api/vacancy'
 import { useAsyncAction } from '../../hooks/useAsync'
 import { useAppSelector } from '../../store/hooks'
 import type { VacancyWithJd } from '../../types/domain'
@@ -52,7 +52,7 @@ export function VacancyForm({ vacancies, loading }: VacancyFormProps) {
     setErrors((er) => ({ ...er, [k]: undefined }));
   };
 
-  const submit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const submit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!vacancy) return;
     const er: Partial<Record<keyof FormData, string>> = {};
@@ -69,8 +69,8 @@ export function VacancyForm({ vacancies, loading }: VacancyFormProps) {
 
     const res = await send.run({
       vacancy_id: vacancy.uuid,
-      fullName: data.name,
-      phoneNumber: data.phone,
+      full_name: data.name,
+      phone_number: data.phone,
       email: data.email,
       city: data.city,
       exp: data.exp,
@@ -109,7 +109,7 @@ export function VacancyForm({ vacancies, loading }: VacancyFormProps) {
           <h2>Заявка отправлена</h2>
           <p style={{ color: 'var(--fg-soft)', fontSize: 14, marginTop: 4 }}>
             Спасибо, {data.name}. HR‑менеджер свяжется с вами по номеру <strong>{data.phone}</strong> в течение 1 рабочего дня.
-            Если телефон не возьмёт — продублируем письмом на {data.email}.
+            Если не ответите — продублируем письмом на {data.email}.
           </p>
           <button
             onClick={() => {
@@ -153,7 +153,12 @@ export function VacancyForm({ vacancies, loading }: VacancyFormProps) {
         </div>
         <div className="field">
           <label>Город</label>
-          <input type="text" value={data.city} onChange={set('city')} placeholder="Нижний Новгород" />
+          <select value={data.city} onChange={set('city')}>
+            <option value="">— не выбрано —</option>
+            <option>Казань</option>
+            <option>Нижний Новгород</option>
+            <option>Челябинск</option>
+          </select>
         </div>
         <div className="field">
           <label>Опыт по профилю</label>
@@ -171,11 +176,11 @@ export function VacancyForm({ vacancies, loading }: VacancyFormProps) {
           <textarea value={data.message} onChange={set('message')} placeholder="Расскажите кратко о проектах, на которых работали" />
         </div>
         <div className="field full">
-          <label>Резюме (PDF / DOC / DOCX / TXT / RTF)</label>
+          <label>Резюме (PDF / DOC / DOCX / ODT / RTF)</label>
           <label className="upload">
             <span>{data.file ? data.file.name : 'Перетащите файл сюда или нажмите'}</span>
             <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--fg-muted)' }}>
-              {data.file ? `${Math.round(data.file.size / 1024)} КБ` : 'до 10 МБ'}
+              &nbsp;{data.file ? `${Math.round(data.file.size / 1024)} КБ` : 'до 10 МБ'}
             </span>
             <input type="file" accept={RESUME_EXTENSIONS.join(',')} onChange={set('file')} style={{ display: 'none' }} />
           </label>

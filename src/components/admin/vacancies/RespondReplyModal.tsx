@@ -17,7 +17,7 @@ export function RespondReplyModal({ responds }: { responds: Respond[] }) {
       stacked // открыта поверх списка откликов
       onClose={() => dispatch(closeRespondReply())}
       kicker="ответ кандидату"
-      title={respond.fullName}
+      title={respond.full_name}
       recipient={respond.email}
       defaultSubject="Ваш отклик на вакансию — IPBuilding"
       send={(subject, message) =>

@@ -1,5 +1,5 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
-import { login as apiLogin, logout as apiLogout, register as apiRegister, getMe } from '../api/authorization'
+import { login as apiLogin, logout as apiLogout, register as apiRegister, getMe, type LoginInput } from '../api/authorization'
 import { authStorage, EXPIRY_SKEW_MS } from '../api/authStorage'
 import { refreshSession } from '../api/client'
 import { ADMIN_ROLE, type User } from '../types/domain'
@@ -9,12 +9,14 @@ interface AuthContextValue {
   isLoading: boolean;
   isAuthenticated: boolean;
   isAdmin: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (input: LoginInput) => Promise<void>;
   register: (name: string, username: string, email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
+
+export type IndetifierType = 'email' | 'username' | 'id' | 'unknown';
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Access-токен живёт только в памяти, поэтому на старте сессии нет по
@@ -104,8 +106,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     restore().then(setUser).catch(() => setUser(null));
   }), [restore]);
 
-  const login = useCallback(async (email: string, password: string) => {
-    const data = await apiLogin({ email, password });
+  // TODO: добавить вход по id и username
+  const login = useCallback(async (input: LoginInput) => {
+    const data = await apiLogin(input);
     setUser(data.user);
     authStorage.broadcast('login');
   }, []);

@@ -6,7 +6,7 @@ import '../styles/authorization.css'
 
 type Mode = 'login' | 'register';
 
-export function AuthorizationPage() {
+export function AuthorizationPage({ embedded = false }: { embedded?: boolean }) {
   const [mode, setMode] = useState<Mode>('login');
 
   useEffect(() => {
@@ -51,9 +51,9 @@ export function AuthorizationPage() {
               </div>
 
               {mode === 'login' ? (
-                <Login key="login" onSwitch={() => setMode('register')} />
+                <Login embedded={embedded} key="login" onSwitch={() => setMode('register')} />
               ) : (
-                <Registration key="register" onSwitch={() => setMode('login')} />
+                <Registration embedded={embedded} key="register" onSwitch={() => setMode('login')} />
               )}
             </div>
           </div>
