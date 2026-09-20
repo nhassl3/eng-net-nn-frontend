@@ -1,6 +1,6 @@
 export const ADMIN_ROLE = 'admin';
 
-export type UserRole = 'admin' | 'user';
+export type UserRole = 'admin' | 'user' | 'partner';
 
 export interface User {
   uuid: string;
