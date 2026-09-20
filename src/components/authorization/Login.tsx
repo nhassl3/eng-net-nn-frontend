@@ -8,6 +8,11 @@ interface Props {
   onSwitch: () => void;
 }
 
+interface LoginErrors {
+  userIn?: string;
+  password?: string;
+}
+
 export function Login({ onSwitch, embedded }: Props & { embedded?: boolean }) {
   const { login } = useAuth();
   const { search } = useLocation();
@@ -17,6 +22,7 @@ export function Login({ onSwitch, embedded }: Props & { embedded?: boolean }) {
   const [showPwd, setShowPwd] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<LoginErrors>({});
   const [failed, setFailed] = useState(false);
 
   const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
@@ -33,14 +39,20 @@ export function Login({ onSwitch, embedded }: Props & { embedded?: boolean }) {
   async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
+
+    const er: LoginErrors = {};
+    const indentifierType = validateInput(userIn);
+    if (indentifierType === 'unknown') {
+      er.userIn = 'Введите корректный email, username (3-30 символов) или ID';
+    }
+    if (!password) {
+      er.password = 'Введите пароль';
+    }
+    setFieldErrors(er);
+    if (Object.keys(er).length) return;
+
     setLoading(true);
     try {
-      const indentifierType = validateInput(userIn);
-      if (indentifierType === 'unknown') {
-        setError(resolveErrorMessage(new ApiError(400, 'INVALID_INPUT', 'uncorrect identifier')));
-        setLoading(false);
-        return;
-      }
       await login({ [indentifierType]: (indentifierType === 'id' ? userIn.toLowerCase() : userIn), password });
       if (!embedded) navigate(resolveNext(search), { replace: true });
     } catch (err) {
@@ -65,9 +77,10 @@ export function Login({ onSwitch, embedded }: Props & { embedded?: boolean }) {
           type="text"
           placeholder="you@company.com | username"
           value={userIn}
-          onChange={(e) => setUserIn(e.target.value)}
+          onChange={(e) => { setUserIn(e.target.value); setFieldErrors((f) => ({ ...f, userIn: undefined })); }}
           required
         />
+        {fieldErrors.userIn && <div className="err">{fieldErrors.userIn}</div>}
       </div>
 
       <div className="auth-field">
@@ -80,7 +93,7 @@ export function Login({ onSwitch, embedded }: Props & { embedded?: boolean }) {
             autoComplete="current-password"
             placeholder="••••••••"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => { setPassword(e.target.value); setFieldErrors((f) => ({ ...f, password: undefined })); }}
             required
           />
           <button
@@ -103,6 +116,7 @@ export function Login({ onSwitch, embedded }: Props & { embedded?: boolean }) {
             )}
           </button>
         </div>
+        {fieldErrors.password && <div className="err">{fieldErrors.password}</div>}
       </div>
 
       <button className="auth-submit" type="submit" disabled={loading}>

@@ -24,6 +24,21 @@ const initialForm: RegistrationForm = {
   confirm: '',
 };
 
+type RegistrationErrors = Partial<Record<keyof RegistrationForm, string>>;
+
+const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+const usernameRegex = /^[a-zA-Z0-9_-]{3,30}$/;
+
+function validate(form: RegistrationForm): RegistrationErrors {
+  const er: RegistrationErrors = {};
+  if (form.fullName.trim().length < 2) er.fullName = 'Укажите имя';
+  if (!usernameRegex.test(form.username)) er.username = 'От 3 до 30 символов: буквы, цифры, _ и -';
+  if (!emailRegex.test(form.email)) er.email = 'Введите корректный email';
+  if (form.password.length < 8) er.password = 'Пароль должен содержать минимум 8 символов';
+  if (form.confirm !== form.password) er.confirm = 'Пароли не совпадают';
+  return er;
+}
+
 export function Registration({ onSwitch, embedded }: Props & { embedded?: boolean }) {
   const navigate = useNavigate();
   const { search } = useLocation();
@@ -32,26 +47,22 @@ export function Registration({ onSwitch, embedded }: Props & { embedded?: boolea
   const [showPwd, setShowPwd] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [errors, setErrors] = useState<RegistrationErrors>({});
 
   function updateField<K extends keyof RegistrationForm>(field: K, value: RegistrationForm[K]) {
     setForm((prev) => ({ ...prev, [field]: value }));
+    setErrors((prev) => ({ ...prev, [field]: undefined }));
   }
 
   async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
 
-    const { fullName, username, email, password, confirm } = form;
+    const er = validate(form);
+    setErrors(er);
+    if (Object.keys(er).length) return;
 
-    if (password !== confirm) {
-      setError('Пароли не совпадают');
-      return;
-    }
-    if (password.length < 8) {
-      setError('Пароль должен содержать минимум 8 символов');
-      return;
-    }
-
+    const { fullName, username, email, password } = form;
     setLoading(true);
     try {
       await register(fullName, username, email, password);
@@ -93,6 +104,7 @@ export function Registration({ onSwitch, embedded }: Props & { embedded?: boolea
           onChange={(e) => updateField('fullName', e.target.value)}
           required
         />
+        {errors.fullName && <div className="err">{errors.fullName}</div>}
       </div>
 
       <div className="auth-field">
@@ -107,6 +119,7 @@ export function Registration({ onSwitch, embedded }: Props & { embedded?: boolea
           onChange={(e) => updateField('username', e.target.value)}
           required
         />
+        {errors.username && <div className="err">{errors.username}</div>}
       </div>
 
       <div className="auth-field">
@@ -121,6 +134,7 @@ export function Registration({ onSwitch, embedded }: Props & { embedded?: boolea
           onChange={(e) => updateField('email', e.target.value)}
           required
         />
+        {errors.email && <div className="err">{errors.email}</div>}
       </div>
 
       <div className="auth-field">
@@ -145,7 +159,7 @@ export function Registration({ onSwitch, embedded }: Props & { embedded?: boolea
             {eyeIcon(showPwd)}
           </button>
         </div>
-        <p className="auth-hint">Минимум 8 символов</p>
+        {errors.password ? <div className="err">{errors.password}</div> : <p className="auth-hint">Минимум 8 символов</p>}
       </div>
 
       <div className="auth-field">
@@ -162,6 +176,7 @@ export function Registration({ onSwitch, embedded }: Props & { embedded?: boolea
             required
           />
         </div>
+        {errors.confirm && <div className="err">{errors.confirm}</div>}
       </div>
 
       <button className="auth-submit" type="submit" disabled={loading}>
