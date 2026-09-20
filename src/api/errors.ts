@@ -50,6 +50,7 @@ const ERROR_MESSAGES: Record<string, string> = {
   EMPTY_DATA: "Нет данных для выполнения процесса. Проверьте правильность заполнения формы",
   UNAUTHORIZED: 'Войдите в систему, чтобы продолжить',
   INVALID_INPUT: 'Некорректные данные. Проверьте правильность заполнения формы',
+  ALREADY_HAS_ROLE: 'Пользователь уже имеет роль админа или партнера'
 };
 
 /**
@@ -85,6 +86,7 @@ const LEGACY_MESSAGE_CODES: Record<string, string> = {
   'empty data': 'EMPTY_DATA',
   'unauthorized': 'UNAUTHORIZED',
   'invalid input: violates a database constraint': 'INVALID_INPUT',
+  'user already has role': 'ALREADY_HAS_ROLE'
 };
 
 /** Запасной перевод по HTTP-статусу, если код/строка не распознаны */
